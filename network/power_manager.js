@@ -8,6 +8,7 @@ var SLEEP_INTERVAL = 180000;
 var idle_time = 0;
 
 exports.enable = function(query, callback) {
+    console.log("power_manager.enable()");
     switchToSleep();
 
     bleno.on('accept', function(clientAddress) {
@@ -19,6 +20,7 @@ exports.enable = function(query, callback) {
 }
 
 exports.disable = function(query, callback) {
+    console.log("power_manager.disable()");
     switchToActive();
 
     clearInterval(idle_monitor);
@@ -28,6 +30,7 @@ exports.disable = function(query, callback) {
 }
 
 function enableBle() {
+    console.log("power_manager.enableBle()");
     ble.enableAdvertising(null, function(error, message) {
         if (error) {
             console.log(error);
@@ -37,6 +40,7 @@ function enableBle() {
 }
 
 function disableBle() {
+    console.log("power_manager.disableBle()");
     ble.disableAdvertising(null, function(error, message) {
         if (error) {
             console.log(error);
@@ -46,6 +50,7 @@ function disableBle() {
 }
 
 function enableWifi() {
+    console.log("power_manager.enableWifi()");
     wifi.turnOn(null, function(error, message) {
         if (error) {
             console.log(error);
@@ -55,6 +60,7 @@ function enableWifi() {
 }
 
 function disableWifi() {
+    console.log("power_manager.disableWifi()");
     wifi.turnOff(null, function(error, message) {
         if (error) {
             console.log(error);
@@ -64,19 +70,23 @@ function disableWifi() {
 }
 
 function switchToActive() {
+    console.log("power_manager.switchToActive()");
     disableBle();
     enableWifi();
 }
 
 function switchToSleep() {
+    console.log("power_manager.switchToSleep()");
     enableBle();
     disableWifi();
 
 }
 
 function registerIdleMonitor() {
+    console.log("power_manager.registerIdleMonitor()");
     idle_time = 0;
     idle_monitor = setInterval(function() {
+        console.log("power_manager.idle_monitor(" + idle_time + "/" + SLEEP_INTERVAL + ")");
         idle_time += TASK_INTERVAL;
         if (idle_time > SLEEP_INTERVAL) {
             switchToSleep();

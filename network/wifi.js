@@ -1,11 +1,11 @@
 var child_process = require("child_process");
 
 exports.turnOn = function(query, callback) {
-    // not implemented yet
+    toggleHostApd(true, callback);
 }
 
 exports.turnOff = function(query, callback) {
-    // not implemented yet
+    toggleHostApd(false, callback);
 }
 
 exports.countConnectedStations = function() {
@@ -13,4 +13,12 @@ exports.countConnectedStations = function() {
     var numConnectedStations = parseInt(buffer.toString());
 
     return numConnectedStations;
+}
+
+function toggleHostApd(turn_on, callback) {
+    var command = (turn_on ? 'start' : 'stop');
+
+    child_process.exec("systemctl " + command + " hostapd.service", function(err, stdout, stderr) {
+        callback(null, "success");
+    });
 }
