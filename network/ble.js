@@ -1,8 +1,8 @@
 var bleno = require('bleno');
-var configMode = require('../model/config.js');
+var configModel = require('../model/config.js');
 
-exports.enableAdvertising = function(callback) {
-    loadConfig(function(err, bleConfig) {
+exports.enableAdvertising = function(query, callback) {
+    loadBleConfig(function(err, bleConfig) {
         if (err) {
             callback(err);
         }
@@ -11,13 +11,17 @@ exports.enableAdvertising = function(callback) {
         var name = bleConfig.BLE_NAME;
         var serviceUuids = [ bleConfig.BLE_SERVICE_UUID ];
         console.log('name = ' + name + ', serviceUuids = ' + serviceUuids);
-        bleno.startAdvertising(name, serviceUuids, callback);
+        bleno.startAdvertising(name, serviceUuids, function() {
+            callback(null, 'success');
+        });
     });
 }
 
-exports.disableAdvertising = function(callback) {
+exports.disableAdvertising = function(query, callback) {
     console.log('stopping BLE advertising');
-    bleno.stopAdvertising(callback);
+    bleno.stopAdvertising(function() {
+        callback(null, 'success');
+    });
 }
 
 function loadBleConfig(callback) {
