@@ -2,7 +2,8 @@ var url = require("url"),
 	path = require("path"),
 	fs = require("fs"),
 	os = require("os"),
-	view = require("../view/view.js");
+	view = require("../view/view.js")
+    q = require("q");
 
 exports.fileGetCallback = function (req, res) {
 	var uri = url.parse(req.url).pathname;
@@ -10,28 +11,29 @@ exports.fileGetCallback = function (req, res) {
 
 	console.log("req.url = " + req.url + ", pathname = " + uri);
 
-	fs.stat(filePath, function (err, stats) {
-		if (err) {
-			if (err.code == "ENOENT") {
-				console.log("no such file '" + filePath + "'");
-				res.sendStatus(404);
-			} else {
-				console.log(err);
-			}
-		} else if (stats.isFile()) {
+    fsStatPromised(filePath)
+    .then(function (stats) {
+   		if (stats.isFile()) {
 			sendFile(filePath, res);
 		} else if (stats.isDirectory()) {
 			sendDirectoryView(filePath, res);
 		} else {
 			res.send("unknown file type " + filePath);
 		}
-	});
+    })
+    .catch(function (error) {
+		if (error.code == "ENOENT") {
+            console.log("no such file '" + filePath + "'");
+            res.sendStatus(404);
+        } else {
+            console.log(error);
+        }
+    });
 };
 
 var sendFile = function (filePath, res) {
 	res.sendFile(filePath, null, function (err) {
 		if (err) {
-			console.log(err);
 			res.status(err.status).end();
 		} else {
 			console.log("Sent:", filePath);
@@ -41,7 +43,8 @@ var sendFile = function (filePath, res) {
 
 var sendDirectoryView = function (dirPath, res) {
 	console.log("dirPath = " + dirPath);
-	exports.getStatOfDirContents(dirPath, function (fileStatses) {
+	exports.getStatOfDirContents(dirPath)
+    .then(function (fileStatses) {
 		files = fileStatses.map(function (fileStats) {
 			return fileStats.file +
 				(fileStats.stats.isDirectory() ? '/' : '');
@@ -51,44 +54,56 @@ var sendDirectoryView = function (dirPath, res) {
 	});
 }
 
-exports.getStatOfDirContents = function (dirPath, callback) {
-	fs.readdir(dirPath, function (err, files) {
+exports.getStatOfDirContents = function (dirPath) {
+    var deferred = q.defer();
+
+	fsReaddirPromised(dirPath)
+    .then(function (files) {
+        var deferred = q.defer();
+
 		// this code can be refactored using promises
 		var absolutePaths = files.map(function (file) {
 			return path.join(dirPath, file);
 		});
 
-		getStatOfFiles(absolutePaths, function (statses) {
-			var fileStatses = files.map(function (_, i)  {
-				return {file: files[i], stats: statses[i]};
-			});
+        deferred.resolve(absolutePaths);
+        return deferred.promise;
+    })
+    .then(getStatOfFiles)
+    .then(function(statses) {
+        statses.map(function(stats) {
+            return stats['file'] = path.basename(stats['file']);
+        });
+        deferred.resolve(statses);
+	})	
+    .catch(function(error) {
+        deferred.reject(error);
+    });
 
-			callback(fileStatses);
-		});
-	});	
+    return deferred.promise;
 }
 
-var getStatOfFiles = function (filePaths, callback) {
-	var numWaiting = filePaths.length;
-	var statses = [];
+var getStatOfFiles = function (filePaths) {
+    var deferred = q.defer();
 
-	if (numWaiting == 0) {
-		callback(statses);
+	if (filePaths.length == 0) {
+        deferred.resolve(statses);
+        return deferred.promise;
 	}
 
-	filePaths.forEach( function (filePath) {
-		fs.stat(filePath, function (err, stats) {
-			if (err) {
-				console.log(err);
-			}
+    var statses = [];
 
-			statses.push(stats);
+    q.all(filePaths.map(fsStatPromised))
+    .then(function (stats) {
+        for (var i = 0; i < filePaths.length; i++) {
+            statses.push({file: filePaths[i], stats: stats[i]});
+        }
 
-			if (--numWaiting == 0) {
-				callback(statses);
-			}
-		});
-	});
+		deferred.resolve(statses);
+    })
+    .catch(deferred.reject);
+
+    return deferred.promise;
 }
 
 exports.getStoragePath = function () {
@@ -107,4 +122,32 @@ exports.getStoragePath = function () {
 
 var sendFileListView = function (res, files) {
 	res.send(view.renderFileList(files));
+}
+
+function fsReaddirPromised(dirPath) {
+    var deferred = q.defer();
+
+	fs.readdir(dirPath, function (error, files) {
+        if (error) {
+            deferred.reject(error);
+        } else {
+            deferred.resolve(files);
+        }
+    });
+
+    return deferred.promise;
+}
+
+function fsStatPromised(filePath) {
+    var deferred = q.defer();
+
+    fs.stat(filePath, function (error, stats) {
+        if (error) {
+            deferred.reject(error);
+        } else {
+            deferred.resolve(stats);
+        }
+    });
+
+    return deferred.promise;
 }
