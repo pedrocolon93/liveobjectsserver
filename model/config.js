@@ -90,5 +90,6 @@ exports.ConfigSchema = mongoose.Schema({
     APPCHANNEL: { type: Number, min: 0, max: 14, default: 1 },
 
     BLE_NAME: { type: String, default: 'myble' },
-    BLE_SERVICE_UUID: { type: String, default: 'fffffffffffffffffffffffffffffff0' }
+    BLE_SERVICE_UUID: { type: String, default: 'fffffffffffffffffffffffffffffff0' },
+    TIME_TO_SLEEP: { type: Number, default: 180000 }
 });

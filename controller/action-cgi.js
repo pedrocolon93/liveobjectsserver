@@ -25,7 +25,9 @@ var actions = [
     new Action('NUM_CONNECTED_WIFI_STA', showConnectedDeviceCount, null),
 
     new Action('ENABLE_POWER_MANAGEMENT', power_manager.enable, null),
-    new Action('DISABLE_POWER_MANAGEMENT', power_manager.disable, null)
+    new Action('DISABLE_POWER_MANAGEMENT', power_manager.disable, null),
+    new Action('GET_TIME_TO_SLEEP', power_manager.getTimeToSleep, null),
+    new Action('SET_TIME_TO_SLEEP', power_manager.setTimeToSleep, [ 'value' ])
 ];
 
 exports.actionExecutionCallback = function (req, res) {
@@ -43,7 +45,7 @@ exports.actionExecutionCallback = function (req, res) {
     })[0];
 
     if (action == undefined) {
-        console.log("action(code=" + op + ") is not defined");
+        console.log("action(code=" + action + ") is not defined");
         res.sendStatus(404);
         return;
     }
@@ -69,7 +71,7 @@ exports.actionExecutionCallback = function (req, res) {
             return;
         }
 
-        res.send(message);
+        res.send(message.toString());
     });
 }
 

@@ -1,6 +1,7 @@
 var ble = require('./ble.js');
 var wifi = require('./wifi.js');
 var bleno = require('bleno');
+var config_model = require('../model/config.js');
 
 var idle_monitor = null;
 var TASK_INTERVAL = 3000;
@@ -27,6 +28,14 @@ exports.disable = function(query, callback) {
     bleno.removeAllListeners('accept');
 
     callback(null, "success");
+}
+
+exports.getTimeToSleep = function(query, callback) {
+    config_model.paramGetter('TIME_TO_SLEEP')(query, callback);
+}
+
+exports.setTimeToSleep = function(query, callback) {
+    config_model.paramSetter('TIME_TO_SLEEP')(query, callback);
 }
 
 function enableBle() {
