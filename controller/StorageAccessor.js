@@ -59,15 +59,12 @@ exports.getStatOfDirContents = function (dirPath) {
 
 	fsReaddirPromised(dirPath)
     .then(function (files) {
-        var deferred = q.defer();
-
 		// this code can be refactored using promises
 		var absolutePaths = files.map(function (file) {
 			return path.join(dirPath, file);
 		});
 
-        deferred.resolve(absolutePaths);
-        return deferred.promise;
+        return absolutePaths;
     })
     .then(getStatOfFiles)
     .then(function(statses) {
