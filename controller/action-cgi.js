@@ -1,6 +1,7 @@
 var fs = require("fs"),
     config = require("../model/config.js"),
     ble = require("../network/ble.js"),
+    wifi = require("../network/wifi.js"),
     child_process = require("child_process"); 
 
 function Action(code, func, params) {
@@ -17,6 +18,10 @@ var actions = [
     new Action('GET_BLE_SERVICE_UUID', config.paramGetter('BLE_SERVICE_UUID'), null),
     new Action('ENABLE_BLE', ble.enableAdvertising, null),
     new Action('DISABLE_BLE', ble.disableAdvertising, null),
+
+    new Action('TURN_ON_WIFI', wifi.turnOn, null),
+    new Action('TURN_OFF_WIFI', wifi.turnOff, null),
+    new Action('NUM_CONNECTED_WIFI_STA', showConnectedDeviceCount, null)
 ];
 
 exports.actionExecutionCallback = function (req, res) {
@@ -69,4 +74,9 @@ function restartNetwork(callback) {
         function (err, stdout, stderr) {
             callback(err);
     }); 
+}
+
+function showConnectedDeviceCount(query, callback) {
+    var count = wifi.countConnectedStations();
+    callback(null, count.toString());
 }
