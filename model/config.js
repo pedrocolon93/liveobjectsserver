@@ -41,7 +41,7 @@ exports.paramSetter = function (paramName) {
                 return;
             }
 
-            var attributes = Object.keys(config.ConfigSchema.paths);
+            var attributes = Object.keys(exports.ConfigSchema.paths);
             if (attributes.indexOf(paramName) == -1) {
                 console.log(attributes);
                 callback("invalid query string '" + paramName + "'");
@@ -90,5 +90,5 @@ exports.ConfigSchema = mongoose.Schema({
     APPCHANNEL: { type: Number, min: 0, max: 14, default: 1 },
 
     BLE_NAME: { type: String, default: 'myble' },
-    BLE_SERVICE_UUID: { type: String, default: 'fffffffffffffff0' }
+    BLE_SERVICE_UUID: { type: String, default: 'fffffffffffffffffffffffffffffff0' }
 });

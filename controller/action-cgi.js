@@ -1,5 +1,6 @@
 var fs = require("fs"),
     config = require("../model/config.js"),
+    ble = require("../network/ble.js"),
     child_process = require("child_process"); 
 
 function Action(code, func, params) {
@@ -14,8 +15,8 @@ var actions = [
     new Action('GET_BLE_NAME', config.paramGetter('BLE_NAME'), null),
     new Action('SET_BLE_SERVICE_UUID', config.paramSetter('BLE_SERVICE_UUID'), [ 'value' ]),
     new Action('GET_BLE_SERVICE_UUID', config.paramGetter('BLE_SERVICE_UUID'), null),
-    new Action('ENABLE_BLE', restartNetwork, null),
-    new Action('DISABLE_BLE', restartNetwork, null),
+    new Action('ENABLE_BLE', ble.enableAdvertising, null),
+    new Action('DISABLE_BLE', ble.disableAdvertising, null),
 ];
 
 exports.actionExecutionCallback = function (req, res) {
