@@ -2,14 +2,9 @@ var http = require("http"),
 	express = require("express"),
     app = express();
 
-app.use(express.static(__dirname + "/client"));
-
 http.createServer(app).listen(3000);
 
-app.get("/hello", function (req, res) {
-	res.send("Hello World!");
-});
+app.get("/*", function (req, res) {
 
-app.get("/goodbye", function (req, res) {
-	res.send("Goodbye World!");
+	res.send("request url: " + req.url.toString());
 });
