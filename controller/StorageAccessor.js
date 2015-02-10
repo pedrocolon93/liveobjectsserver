@@ -12,8 +12,9 @@ var fileGetCallback = function (req, res) {
 
 	fs.stat(filePath, function (err, stats) {
 		if (err) {
-			if (err.code == "NOENT") {
-				res.send("file doesn't exist " + filePath);
+			if (err.code == "ENOENT") {
+				console.log("no such file '" + filePath + "'");
+				res.sendStatus(404);
 			} else {
 				console.log(err);
 			}

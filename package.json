@@ -4,6 +4,7 @@
 	"version": "0.0.1",
 	"dependencies" : {
 		"express": "4.11.2",
-		"jade": "1.9.2"
+		"jade": "1.9.2",
+        "multiparty": "4.1.1"
 	}
 }
