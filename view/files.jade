@@ -5,4 +5,5 @@ html
 	body
 		ul
 			each file in files
-				li #{file}
+				li
+					a(href="#{dir}/#{file}") #{file}

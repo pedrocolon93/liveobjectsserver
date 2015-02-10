@@ -6,7 +6,9 @@ var url = require("url"),
 
 var fileGetCallback = function (req, res) {
 	var uri = url.parse(req.url).pathname;
-	var filePath = path.join(process.cwd(), "storage", uri);
+	var filePath = path.join(getStoragePath(), uri);
+
+	console.log("req.url = " + req.url + ", pathname = " + uri);
 
 	fs.stat(filePath, function (err, stats) {
 		if (err) {
@@ -40,8 +42,13 @@ var sendDirectoryView = function (filePath, res) {
 	console.log("the file is a directory " + filePath);
 
 	fs.readdir(filePath, function (err, files) {
-		res.send(view.renderFileList(files));
+		var dir = path.relative(getStoragePath(), filePath);
+		res.send(view.renderFileList(dir, files));
 	});
+}
+
+var getStoragePath = function () {
+	return path.join(process.cwd(), "storage");
 }
 
 StorageAccessor = {};
