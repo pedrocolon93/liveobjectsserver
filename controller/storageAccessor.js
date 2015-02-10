@@ -42,8 +42,32 @@ var sendDirectoryView = function (filePath, res) {
 	console.log("the file is a directory " + filePath);
 
 	fs.readdir(filePath, function (err, files) {
-		var dir = path.relative(getStoragePath(), filePath);
-		res.send(view.renderFileList(dir, files));
+		// this code can be refactored using promises
+		var numWaiting = files.length;
+
+		var addPathSuffix = function (index) {
+			console.log("filePath = " + filePath);
+			console.log("files[" + index + "] = " + files[index]);
+			var absolutePath = path.join(filePath, files[index]);
+			fs.stat(absolutePath, function (err, stats) {
+				if (err) {
+					console.log(err);
+				}
+
+				if (stats.isDirectory()) {
+					files[index] += '/';
+				}
+
+				if (--numWaiting == 0) {
+					var dir = path.relative(getStoragePath(), filePath);
+					res.send(view.renderFileList(dir, files));
+				}
+			});
+		}
+
+		for (var i = 0; i < files.length; i++) {
+			addPathSuffix(i);
+		}
 	});
 }
 
