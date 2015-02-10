@@ -1,7 +1,8 @@
 var url = require("url"),
 	path = require("path"),
 	fs = require("fs"),
-	os = require("os");
+	os = require("os"),
+	view = require("../view/view.js");
 
 var fileGetCallback = function (req, res) {
 	var uri = url.parse(req.url).pathname;
@@ -39,11 +40,7 @@ var sendDirectoryView = function (filePath, res) {
 	console.log("the file is a directory " + filePath);
 
 	fs.readdir(filePath, function (err, files) {
-		files.forEach(function (file) {
-			res.write(file + os.EOL);
-		});
-
-		res.end();
+		res.send(view.renderFileList(files));
 	});
 }
 
