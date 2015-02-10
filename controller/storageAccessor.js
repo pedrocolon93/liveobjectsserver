@@ -1,7 +1,7 @@
 var url = require("url"),
 	path = require("path"),
 	fs = require("fs"),
-    app = express();
+	os = require("os");
 
 var fileGetCallback = function (req, res) {
 	var uri = url.parse(req.url).pathname;
@@ -36,7 +36,18 @@ var sendFile = function (filePath, res) {
 }
 
 var sendDirectoryView = function (filePath, res) {
-	res.send("the file is a directory " + filePath);
+	console.log("the file is a directory " + filePath);
+
+	fs.readdir(filePath, function (err, files) {
+		files.forEach(function (file) {
+			res.write(file + os.EOL);
+		});
+
+		res.end();
+	});
 }
 
-module.exports = fileGetCallback;
+StorageAccessor = {};
+StorageAccessor.fileGetCallback = fileGetCallback;
+
+module.exports = StorageAccessor;
