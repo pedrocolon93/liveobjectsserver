@@ -15,20 +15,28 @@ var fileGetCallback = function (req, res) {
 				console.log(err);
 			}
 		} else if (stats.isFile()) {
-			res.sendFile(filePath, null, function (err) {
-				if (err) {
-					console.log(err);
-					res.status(err.status).end();
-				} else {
-					console.log("Sent:", filePath);
-				}
-			});
+			sendFile(filePath, res);
 		} else if (stats.isDirectory()) {
-			res.send("the file is a directory " + filePath);
+			sendDirectoryView(filePath, res);
 		} else {
 			res.send("unknown file type " + filePath);
 		}
 	});
 };
+
+var sendFile = function (filePath, res) {
+	res.sendFile(filePath, null, function (err) {
+		if (err) {
+			console.log(err);
+			res.status(err.status).end();
+		} else {
+			console.log("Sent:", filePath);
+		}
+	});
+}
+
+var sendDirectoryView = function (filePath, res) {
+	res.send("the file is a directory " + filePath);
+}
 
 module.exports = fileGetCallback;
