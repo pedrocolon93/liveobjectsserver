@@ -12,7 +12,7 @@ Uploader.uploadFormCallback = function (req, res) {
 };
 
 Uploader.uploadFileCallback = function (req, res) {
-	var form = new multiparty.Form();
+	var form = new multiparty.Form({uploadDir: path.join(__dirname, "../tmp")});
 
 	form.on("file", function (name, file) {
 		console.log(name);
@@ -20,7 +20,7 @@ Uploader.uploadFileCallback = function (req, res) {
 
 		var tmpPath = file.path;
 		var uploadPath = path.join(__dirname, "../storage", file.originalFilename);
-		console.log("uploadPath = " + uploadPath);
+		console.log("uploadPath := " + uploadPath);
 		fs.renameSync(tmpPath, uploadPath);
 	});
 
