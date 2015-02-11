@@ -46,35 +46,42 @@ var sendDirectoryView = function (filePath, res) {
 
 	fs.readdir(filePath, function (err, files) {
 		// this code can be refactored using promises
-		var numWaiting = files.length;
+		var absolutePaths = files.map(function (file) {
+			return path.join(filePath, file);
+		});
 
-		if (numWaiting == 0) {
-			sendFileListView(res, filePath, {});
-			return;
-		}
-
-		var addPathSuffix = function (index) {
-			console.log("filePath = " + filePath);
-			console.log("files[" + index + "] = " + files[index]);
-			var absolutePath = path.join(filePath, files[index]);
-			fs.stat(absolutePath, function (err, stats) {
-				if (err) {
-					console.log(err);
+		getStatOfFiles(absolutePaths, function (statses) {
+			for (var i = 0; i < files.length; i++) {
+				if (statses[i].isDirectory()) {
+					files[i] += '/';
 				}
+			}
 
-				if (stats.isDirectory()) {
-					files[index] += '/';
-				}
+			sendFileListView(res, filePath, files);
+		});
+	});
+}
 
-				if (--numWaiting == 0) {
-					sendFileListView(res, filePath, files);
-				}
-			});
-		}
+var getStatOfFiles = function (filePaths, callback) {
+	var numWaiting = filePaths.length;
+	var statses = [];
 
-		for (var i = 0; i < files.length; i++) {
-			addPathSuffix(i);
-		}
+	if (numWaiting == 0) {
+		callback(statses);
+	}
+
+	filePaths.forEach( function (filePath) {
+		fs.stat(filePath, function (err, stats) {
+			if (err) {
+				console.log(err);
+			}
+
+			statses.push(stats);
+
+			if (--numWaiting == 0) {
+				callback(statses);
+			}
+		});
 	});
 }
 
