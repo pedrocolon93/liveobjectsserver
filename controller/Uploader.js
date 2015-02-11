@@ -11,6 +11,8 @@ var uploadConfig = {
 		WRITEPROTECT: {type: 'boolean', value: false, postSetting: null},
 	};
 
+var storagePath = path.join(__dirname, "../storage");
+
 Uploader = {};
 
 Uploader.uploadFormCallback = function (req, res) {
@@ -53,11 +55,27 @@ Uploader.uploadFormCallback = function (req, res) {
 	}
 };
 
+Uploader.uploadFileCallback = function (req, res) {
+	var form = new multiparty.Form({uploadDir: path.join(__dirname, "../tmp")});
+
+	form.on("file", function (name, file) {
+		console.log(name);
+		console.log(file);
+
+		var tmpPath = file.path;
+		var uploadPath = path.join(storagePath, file.originalFilename);
+		console.log("uploadPath := " + uploadPath);
+		fs.renameSync(tmpPath, uploadPath);
+	});
+
+	form.parse(req);
+};
+
 function createUpdir (dir) {
 	console.log("createUpdir() called");
 
-	var absoluteDir = path.join(__dirname, "../storage", dir);
-	var absoluteParent = path.join(__dirname, "../storage", path.join(dir, "../"));
+	var absoluteDir = path.join(storagePath, dir);
+	var absoluteParent = path.join(storagePath, path.join(dir, "../"));
 	fs.exists(absoluteParent, function (exists) {
 		if (!exists) {
 			console.log("parent doesn't exist " + absoluteParent);
@@ -79,21 +97,5 @@ function createUpdir (dir) {
 		});
 	});
 }
-
-Uploader.uploadFileCallback = function (req, res) {
-	var form = new multiparty.Form({uploadDir: path.join(__dirname, "../tmp")});
-
-	form.on("file", function (name, file) {
-		console.log(name);
-		console.log(file);
-
-		var tmpPath = file.path;
-		var uploadPath = path.join(__dirname, "../storage", file.originalFilename);
-		console.log("uploadPath := " + uploadPath);
-		fs.renameSync(tmpPath, uploadPath);
-	});
-
-	form.parse(req);
-};
 
 module.exports = Uploader;
