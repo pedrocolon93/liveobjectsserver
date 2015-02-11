@@ -44,7 +44,14 @@ Uploader.uploadFormCallback = function (req, res) {
 
 				console.log(uploadQuery[param]);
 				if (uploadQuery[param].postSetting) {
-					uploadQuery[param].postSetting(configValue, res);
+					uploadQuery[param].postSetting(configValue, function (err) {
+						if (err) {
+							console.log(err);
+							res.send("failure");
+						} else {
+							res.send("success");
+						}
+					});
 				}
 			}
 		});
@@ -72,43 +79,24 @@ Uploader.uploadFileCallback = function (req, res) {
 	form.parse(req);
 };
 
-function createUpdir (dir, res) {
+function createUpdir (dir, callback) {
 	console.log("createUpdir() called");
 
 	var absoluteDir = path.join(storagePath, dir);
-	var absoluteParent = path.join(storagePath, path.join(dir, "../"));
-	fs.exists(absoluteParent, function (exists) {
-		if (!exists) {
-			console.log("parent doesn't exist " + absoluteParent);
-			res.send("failure");
-			return;
-		}
 
-		fs.exists(absoluteDir, function (exists) {
-			if (exists) {
-				console.log("dir exists");
-				return;
-			}
-
-			console.log("creaing dir " + absoluteDir);
-			fs.mkdir(absoluteDir, function (err) {
-				if (err) {
-					console.log(err);
-				}
-			});
-		});
+	fs.mkdir(absoluteDir, function (err) {
+		callback(err);
 	});
 }
 
-function deleteFile (filePath, res) {
+function deleteFile (filePath, callback) {
 	console.log(storagePath);
 	console.log(filePath);
 	var absolutePath = path.join(storagePath, filePath);
 
 	fs.stat(absolutePath, function (err, stats) {
 		if (err) {
-			console.log(err);
-			res.send("failure");
+			callback(err);
 			return;
 		}
 
@@ -123,13 +111,7 @@ function deleteFile (filePath, res) {
 		}
 
 		deleteFunction(absolutePath, function (err) {
-			if (err) {
-				console.log(err);
-				res.send("failure");
-				return;
-			}
-
-			res.send("success");			
+			callback(err);
 		});
 	});
 }
