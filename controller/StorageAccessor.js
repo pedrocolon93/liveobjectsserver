@@ -49,8 +49,7 @@ var sendDirectoryView = function (filePath, res) {
 		var numWaiting = files.length;
 
 		if (numWaiting == 0) {
-			var dir = path.relative(getStoragePath(), filePath);
-			res.send(view.renderFileList(dir, {}));
+			sendFileListView(res, filePath, {});
 			return;
 		}
 
@@ -68,8 +67,7 @@ var sendDirectoryView = function (filePath, res) {
 				}
 
 				if (--numWaiting == 0) {
-					var dir = path.relative(getStoragePath(), filePath);
-					res.send(view.renderFileList(dir, files));
+					sendFileListView(res, filePath, files);
 				}
 			});
 		}
@@ -82,6 +80,11 @@ var sendDirectoryView = function (filePath, res) {
 
 var getStoragePath = function () {
 	return path.join(process.cwd(), "storage");
+}
+
+var sendFileListView = function (res, filePath, files) {
+	var dir = path.relative(getStoragePath(), filePath);
+	res.send(view.renderFileList(dir, files));
 }
 
 module.exports = StorageAccessor;
