@@ -5,10 +5,11 @@ var url = require("url"),
 	multiparty = require("multiparty"),
 	view = require("../view/view.js");
 
-var uploadConfig = {
+var uploadQuery = {
 		UPDIR: {type: 'string', value: "/", postSetting: createUpdir},
 		FTIME: {type: 'number', value: 0, postSetting: null},
 		WRITEPROTECT: {type: 'boolean', value: false, postSetting: null},
+		DEL: {type: 'string', value: null, postSetting: deleteFile}
 	};
 
 var storagePath = path.join(__dirname, "../storage");
@@ -21,11 +22,11 @@ Uploader.uploadFormCallback = function (req, res) {
 	if (Object.keys(req.query).length > 0) {
 		var configValue;
 
-		Object.keys(uploadConfig).forEach(function (param) {
+		Object.keys(uploadQuery).forEach(function (param) {
 			if (param in req.query) {
 				var queryValue = req.query[param];
 
-				switch (uploadConfig[param].type) {
+				switch (uploadQuery[param].type) {
 					case 'string':
 						configValue = queryValue;
 						break;
@@ -39,17 +40,14 @@ Uploader.uploadFormCallback = function (req, res) {
 						// should never occur
 				}
 
-				uploadConfig[param].value = configValue;
+				uploadQuery[param].value = configValue;
 
-				console.log(uploadConfig[param]);
-				if (uploadConfig[param].postSetting) {
-					uploadConfig[param].postSetting(configValue);
+				console.log(uploadQuery[param]);
+				if (uploadQuery[param].postSetting) {
+					uploadQuery[param].postSetting(configValue, res);
 				}
 			}
 		});
-
-		console.log(uploadConfig);
-		res.send("success");
 	} else {
 		res.send(view.renderUploadForm());
 	}
@@ -64,15 +62,17 @@ Uploader.uploadFileCallback = function (req, res) {
 
 		var tmpPath = file.path;
 		var uploadPath = path.join(
-			storagePath, uploadConfig.UPDIR.value, file.originalFilename);
+			storagePath, uploadQuery.UPDIR.value, file.originalFilename);
 		console.log("uploadPath := " + uploadPath);
 		fs.renameSync(tmpPath, uploadPath);
+
+		res.send("success");
 	});
 
 	form.parse(req);
 };
 
-function createUpdir (dir) {
+function createUpdir (dir, res) {
 	console.log("createUpdir() called");
 
 	var absoluteDir = path.join(storagePath, dir);
@@ -80,6 +80,7 @@ function createUpdir (dir) {
 	fs.exists(absoluteParent, function (exists) {
 		if (!exists) {
 			console.log("parent doesn't exist " + absoluteParent);
+			res.send("fail");
 			return;
 		}
 
@@ -96,6 +97,18 @@ function createUpdir (dir) {
 				}
 			});
 		});
+	});
+}
+
+function deleteFile (filePath, res) {
+	console.log(storagePath);
+	console.log(filePath);
+	var absolutePath = path.join(storagePath, filePath);
+
+	fs.unlink(absolutePath, function (err) {
+		if (err) {
+			console.log(err);
+		}
 	});
 }
 
