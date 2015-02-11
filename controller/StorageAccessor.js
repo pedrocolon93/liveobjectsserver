@@ -4,7 +4,9 @@ var url = require("url"),
 	os = require("os"),
 	view = require("../view/view.js");
 
-var fileGetCallback = function (req, res) {
+StorageAccessor = {};
+
+StorageAccessor.fileGetCallback = function (req, res) {
 	var uri = url.parse(req.url).pathname;
 	var filePath = path.join(getStoragePath(), uri);
 
@@ -46,6 +48,12 @@ var sendDirectoryView = function (filePath, res) {
 		// this code can be refactored using promises
 		var numWaiting = files.length;
 
+		if (numWaiting == 0) {
+			var dir = path.relative(getStoragePath(), filePath);
+			res.send(view.renderFileList(dir, {}));
+			return;
+		}
+
 		var addPathSuffix = function (index) {
 			console.log("filePath = " + filePath);
 			console.log("files[" + index + "] = " + files[index]);
@@ -75,8 +83,5 @@ var sendDirectoryView = function (filePath, res) {
 var getStoragePath = function () {
 	return path.join(process.cwd(), "storage");
 }
-
-StorageAccessor = {};
-StorageAccessor.fileGetCallback = fileGetCallback;
 
 module.exports = StorageAccessor;
