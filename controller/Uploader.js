@@ -63,7 +63,8 @@ Uploader.uploadFileCallback = function (req, res) {
 		console.log(file);
 
 		var tmpPath = file.path;
-		var uploadPath = path.join(storagePath, file.originalFilename);
+		var uploadPath = path.join(
+			storagePath, uploadConfig.UPDIR.value, file.originalFilename);
 		console.log("uploadPath := " + uploadPath);
 		fs.renameSync(tmpPath, uploadPath);
 	});
