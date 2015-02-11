@@ -80,7 +80,7 @@ function createUpdir (dir, res) {
 	fs.exists(absoluteParent, function (exists) {
 		if (!exists) {
 			console.log("parent doesn't exist " + absoluteParent);
-			res.send("fail");
+			res.send("failure");
 			return;
 		}
 
@@ -105,10 +105,32 @@ function deleteFile (filePath, res) {
 	console.log(filePath);
 	var absolutePath = path.join(storagePath, filePath);
 
-	fs.unlink(absolutePath, function (err) {
+	fs.stat(absolutePath, function (err, stats) {
 		if (err) {
 			console.log(err);
+			res.send("failure");
+			return;
 		}
+
+		var deleteFunction;
+		if (stats.isFile()) {
+			deleteFunction = fs.unlink;
+		} else if (stats.isDirectory()) {
+			deleteFunction = fs.rmdir;
+		} else {
+			console.log("invalid file type " + JSON.stringify(stats));
+			return;
+		}
+
+		deleteFunction(absolutePath, function (err) {
+			if (err) {
+				console.log(err);
+				res.send("failure");
+				return;
+			}
+
+			res.send("success");			
+		});
 	});
 }
 
