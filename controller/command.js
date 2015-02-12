@@ -4,6 +4,7 @@ var url = require("url"),
 	os = require("os"),
 	multiparty = require("multiparty"),
 	StorageAccessor = require("./StorageAccessor.js");
+	commandResponse = require("../view/commandResponse.js");
 	view = require("../view/view.js");
 
 command = {};
@@ -35,6 +36,8 @@ command.commandExecutionCallback = function (req, res) {
 		return;
 	}
 
+	res.contentType('text/plain');
+
 	commands[op].func(query, function (message) {
 		res.send(message);
 	});
@@ -45,12 +48,9 @@ function getFileList (query, callback) {
 	console.log("query string: dir=" + absoluteDir);
 
 	StorageAccessor.getStatOfDirContents(absoluteDir, function (fileStatses) {
-		
-		console.log(files);
-		console.log(statses);
+		var fileList = commandResponse.createFileList(query.DIR, fileStatses);
+		callback(fileList);
 	});
-
-	callback("placeholder");
 }
 
 function getNumFiles (query, callback) {
