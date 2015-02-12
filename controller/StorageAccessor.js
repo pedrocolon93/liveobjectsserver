@@ -44,12 +44,11 @@ var sendFile = function (filePath, res) {
 var sendDirectoryView = function (dirPath, res) {
 	console.log("the file is a directory " + dirPath);
 
-	StorageAccessor.get(dirPath, function (files, statses) {
-		for (var i = 0; i < files.length; i++) {
-			if (statses[i].isDirectory()) {
-				files[i] += '/';
-			}
-		}
+	StorageAccessor.getStatOfDirContents(dirPath, function (fileStatses) {
+		files = fileStatses.map(function (fileStats) {
+			return fileStats.file +
+				(fileStats.stats.isDirectory() ? '/' : '');
+		});
 
 		sendFileListView(res, dirPath, files);
 	});
