@@ -2,10 +2,14 @@ var mongoose = require('mongoose');
 
 var config = {};
 
-mongoose.connect('mongodb://localhost/flashair-compat-server');
-mongoose.connection.on("open", function () {
-	config.Config = mongoose.model("Config", config.ConfigSchema);
-});
+config.connect = function (callback) {
+	mongoose.connect('mongodb://localhost/flashair-compat-server');
+	mongoose.connection.on("open", function () {
+		config.Config = mongoose.model("Config", config.ConfigSchema);
+
+		callback();
+	});
+}
 
 config.ConfigSchema = mongoose.Schema({
 	"APPAUTOTIME": 	Number,
@@ -19,7 +23,7 @@ config.ConfigSchema = mongoose.Schema({
 	"CID": String,
 	"CIPATH": String,
 	"DELCGI": String,
-	"DNSMODE": Number;
+	"DNSMODE": Number,
 	"IFMODE": Number,
 	"LOCK": Number,
 	"MASTERCODE": String,
