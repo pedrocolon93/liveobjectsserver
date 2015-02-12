@@ -44,7 +44,7 @@ var sendFile = function (filePath, res) {
 var sendDirectoryView = function (dirPath, res) {
 	console.log("the file is a directory " + dirPath);
 
-	StorageAccessor.getStatOfDirContents(dirPath, function (files, statses) {
+	StorageAccessor.get(dirPath, function (files, statses) {
 		for (var i = 0; i < files.length; i++) {
 			if (statses[i].isDirectory()) {
 				files[i] += '/';
@@ -63,7 +63,11 @@ StorageAccessor.getStatOfDirContents = function (dirPath, callback) {
 		});
 
 		getStatOfFiles(absolutePaths, function (statses) {
-			callback(files, statses);
+			var fileStatses = files.map(function (_, i)  {
+				return {file: files[i], stats: statses[i]};
+			});
+
+			callback(fileStatses);
 		});
 	});	
 }

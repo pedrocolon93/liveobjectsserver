@@ -44,7 +44,8 @@ function getFileList (query, callback) {
 	var absoluteDir = path.join(StorageAccessor.getStoragePath(), query.DIR);
 	console.log("query string: dir=" + absoluteDir);
 
-	StorageAccessor.getStatOfDirContents(absoluteDir, function (files, statses) {
+	StorageAccessor.getStatOfDirContents(absoluteDir, function (fileStatses) {
+		
 		console.log(files);
 		console.log(statses);
 	});
