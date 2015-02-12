@@ -5,6 +5,8 @@
 	"dependencies" : {
 		"express": "4.11.2",
 		"jade": "1.9.2",
-        "multiparty": "4.1.1"
+	        "multiparty": "4.1.1",
+		"q": "1.1.2",
+		"mocha": "2.1.0"
 	}
 }

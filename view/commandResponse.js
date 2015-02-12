@@ -1,22 +1,34 @@
 var path = require("path"),
 	fs = require('fs'),
-	jade = require("jade");
-
-var renderFileList = function (dir, files) {
-	console.log("files = " + files);
-
-	var jadePath = path.join(process.cwd(), "view", "files.jade");
-	var html = jade.renderFile(jadePath, {"dir": dir, "files": files});
-	console.log("html = " + html);
-
-	return html;
-}
-
-var renderUploadForm = function () {
-	return fs.readFileSync("view/upload.html", {"encoding": "utf8"});
-}
+	os = require('os');
 
 view = {}
-view.renderFileList = renderFileList;
-view.renderUploadForm = renderUploadForm;
+
+view.createFileList = function (dir, fileStatses) {
+	console.log(fileStatses);
+
+	var fileList = "WLANSD_FILELIST" + os.EOL;
+
+	fileStatses.forEach(function (fileStats) {
+		stats = fileStats.stats;
+
+		fileList += dir + ", " + fileStats.file + ", " + stats.size + ", " +
+			buildAttribute(stats) + ", " + buildDate + ", " + buildTime + os.EOL;
+	});
+
+	return fileList;
+}
+
+var buildAttribute = function (stats) {
+	return "<dummy>";
+}
+
+var buildDate = function (stats) {
+	return "<dummy>";
+}
+
+var buildTime = function (stats) {
+	return "<dummy>";
+}
+
 module.exports = view;
