@@ -8,10 +8,27 @@ mongoose.connection.on("open", function () {
 });
 
 config.ConfigSchema = mongoose.Schema({
-	"APPAUTOTIME": Number,
+	"APPAUTOTIME": 	Number,
 	"APPINFO": String,
-	"APPMODE": Number
+	"APPMODE": Number,
+	"APPNAME": String,
+	"APPNETWORKKEY": String,
+	"APPSSID": String,
+	"BRGNETWORKKEY": String,
+	"BRGSSID": String,
+	"CID": String,
+	"CIPATH": String,
+	"DELCGI": String,
+	"DNSMODE": Number;
+	"IFMODE": Number,
+	"LOCK": Number,
+	"MASTERCODE": String,
+	"NOISE_CANCEL": Number,
+	"PRODUCT": String,
+	"UPDIR": String,
+	"UPLOAD": Number,
+	"VENDOR": String,
+	"VERSION": String
 });
-
 
 module.exports = config;
