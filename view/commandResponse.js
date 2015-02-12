@@ -1,6 +1,5 @@
 var path = require("path"),
 	fs = require('fs'),
-	os = require('os'),
 	sprintf = require('sprintf').sprintf;
 
 view = {}
@@ -13,24 +12,42 @@ view.createFileList = function (dir, fileStatses) {
 	fileStatses.forEach(function (fileStats) {
 		stats = fileStats.stats;
 
-		fileList += sprintf("%s, %s, %d, %d, %d, %d",
+		fileList += sprintf("%s,%s,%d,%d,%d,%d\r\n",
 			dir, fileStats.file, stats.size,
-			buildAttribute(stats), buildDate(stats), buildTime(stats)) + os.EOL;
+			buildAttribute(stats), buildDate(stats), buildTime(stats));
 	});
 
 	return fileList;
 }
 
 var buildAttribute = function (stats) {
-	return 0;
+	var bits = 0;
+
+	if (stats.isDirectory()) bits = (1 << 4);
+
+	return bits;
 }
 
 var buildDate = function (stats) {
-	return 0;
+	var ctime = stats.ctime;
+	var bits = 0;
+
+	bits |= (ctime.getFullYear() - 1980) << 9;
+	bits |= (ctime.getMonth() + 1) << 5;
+	bits |= ctime.getDate();
+
+	return bits;
 }
 
 var buildTime = function (stats) {
-	return 0;
+	var ctime = stats.ctime;
+	var bits = 0;
+
+	bits |= ctime.getHours() << 11;
+	bits |= ctime.getMinutes() << 5;
+	bits |= Math.floor(ctime.getSeconds() / 2);
+
+	return bits;
 }
 
 module.exports = view;
