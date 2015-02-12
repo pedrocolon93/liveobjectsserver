@@ -11,7 +11,28 @@ command = {};
 
 var commands = {
 	'100' : { func: getFileList, params: [ "DIR" ] },
-	'101' : { func: getNumFiles, params: null }
+	'101' : { func: getNumFiles, params: [ "DIR" ] },
+	'102' : { func: isUpdated, params: null},
+	'104' : { func: getSsid, params: null},
+	'105' : { func: getNetworkPassword, params: null},
+	'106' : { func: getClientMacAddress, params: null},
+//	'107' not implemented
+//  '108' not implemented
+//  '109' not implemented
+	'110' : { func: getWlanMode, param: null},
+	'111' : { func: getWlanTimeout, param: null},
+// '117' not implemented
+	'118' : { func: isUploadEnabled, param: null}
+// '120' not implemented
+// '121' not implemented
+// '130' not implemented
+// '131' not implemented
+// '140' not implemented
+// '190' not implemented
+// '200' not implemented
+// '201' not implemented
+// '202' not implemented
+// '203' not implemented
 };
 
 command.commandExecutionCallback = function (req, res) {
@@ -26,14 +47,16 @@ command.commandExecutionCallback = function (req, res) {
 		return;
 	}
 
-	var allQueriesExist = commands[op].params.reduce(function (accum, param) {
-		return accum && (param in query);
-	}, true);
+	if (commands[op].params) {
+		var allQueriesExist = commands[op].params.reduce(function (accum, param) {
+			return accum && (param in query);
+		}, true);
 
-	if (!allQueriesExist) {
-		console.log("one or more missing query strings");
-		res.sendStatus(404);
-		return;
+		if (!allQueriesExist) {
+			console.log("one or more missing query strings");
+			res.sendStatus(404);
+			return;
+		}
 	}
 
 	res.contentType('text/plain');
@@ -54,7 +77,41 @@ function getFileList (query, callback) {
 }
 
 function getNumFiles (query, callback) {
-	callback("placeholder");
+	var absoluteDir = path.join(StorageAccessor.getStoragePath(), query.DIR);
+
+	StorageAccessor.getStatOfDirContents(absoluteDir, function (fileStatses) {
+		callback(fileStatses.length.toString());
+	});
 }
+
+function isUpdated (query, callback) {
+	// always returns 0 ('not updated')
+	callback('0');
+}
+
+function getSsid (query, callback) {
+	callback('dummy-ssid'); // placeholder
+}
+
+function getNetworkPassword (query, callback) {
+	callback('12345678'); // placeholder
+}
+
+function getClientMacAddress (query, callback) {
+	callback('aabbccddeeff'); // placeholder
+}
+
+function getWlanMode (query, callback) {
+	callback('4'); // placeholder
+}
+
+function getWlanTimeout (query, callback) {
+	callback('0'); // placeholder
+}
+
+function isUploadEnabled (query, callback) {
+	callback('1'); // placeholder
+}
+
 
 module.exports = command;
