@@ -3,16 +3,13 @@ var url = require("url"),
 	fs = require("fs"),
 	os = require("os"),
 	multiparty = require("multiparty"),
+    mongoose = require("mongoose"),
 	StorageAccessor = require("./StorageAccessor.js");
 	commandResponse = require("../view/commandResponse.js");
+    configModel = require("../model/config.js");
 	view = require("../view/view.js");
 
 configCgi = {};
-
-var commands = [
-    { queries: [ 'APPAUTOTIME', 'APPMODE' ], func: setConnectionTimeout },
-    { queries: [ 'APPINFO' ], func: setAppSpecificData }
-];
 
 configCgi.configExecutionCallback = function (req, res) {
 	var query = req.query;
@@ -22,33 +19,51 @@ configCgi.configExecutionCallback = function (req, res) {
 
 	if (!masterCode) {
 		console.log("config commands require the query string 'MASTERCODE'");
-		res.sendStatus(404);
+        res.send('ERROR');
 		return;
 	}
 
-    for (var i = 0; i < commands.length; i++) {
-        var allQueriesExist = commands[i].queries.reduce(function (accum, param) {
-            return accum && (param in query);
-    }, true);
-        
+    delete query.MASTERCODE;
 
-        if (allQueriesExist) {
-            res.contentType('text/plain');
-            commands[i].func(query, function (succeeded) {
-                res.send(succeeded ? 'SUCCESS' : 'ERROR');
-            });
+    res.contentType('text/plain');
 
+    configModel.Config.find({}, function (err, configs) {
+        if (err) {
+            console.log(err);
+            res.send('ERROR');
             return;
         }
-    }
-}
 
-function setConnectionTimeout (query, callback) {
-    callback(false);
-}
+        console.log("configs.length = " + configs.length);
+        var config = configs.length > 0 ? configs[0] : new configModel.Config();
 
-function setAppSpecificData (query, callback) {
-    callback(false);
+        var invalidQueryExists = false;
+        Object.keys(query).forEach(function (queryString) {
+            var attributes = Object.keys(configModel.ConfigSchema.paths);
+            if (attributes.indexOf(queryString) == -1) {
+                console.log("invalid query string '" + queryString + "'");
+                console.log(attributes);
+                invalidQueryExists = true;
+                return;
+            }
+
+            config.queryString = query[queryString];
+        });
+
+        if (invalidQueryExists) {
+            res.send('ERROR');
+            return;
+        }
+
+        config.save(function (err) {
+            if (err) {
+                console.log(err);
+                res.send('ERROR');
+            } else {
+                res.send('SUCCESS');
+            }
+        });
+    });
 }
 
 module.exports = configCgi;
