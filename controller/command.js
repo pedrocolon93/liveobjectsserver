@@ -3,7 +3,7 @@ var url = require("url"),
 	fs = require("fs"),
 	os = require("os"),
 	multiparty = require("multiparty"),
-	StorageController = require("./StorageController.js");
+	StorageAccessor = require("./StorageAccessor.js");
 	view = require("../view/view.js");
 
 command = {};
@@ -41,10 +41,13 @@ command.commandExecutionCallback = function (req, res) {
 }
 
 function getFileList (query, callback) {
-	var dir = query.DIR;
-	console.log("query string: dir=" + dir);
+	var absoluteDir = path.join(StorageAccessor.getStoragePath(), query.DIR);
+	console.log("query string: dir=" + absoluteDir);
 
-
+	StorageAccessor.getStatOfDirContents(absoluteDir, function (files, statses) {
+		console.log(files);
+		console.log(statses);
+	});
 
 	callback("placeholder");
 }

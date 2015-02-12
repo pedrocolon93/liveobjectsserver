@@ -8,7 +8,7 @@ StorageAccessor = {};
 
 StorageAccessor.fileGetCallback = function (req, res) {
 	var uri = url.parse(req.url).pathname;
-	var filePath = path.join(getStoragePath(), uri);
+	var filePath = path.join(StorageAccessor.getStoragePath(), uri);
 
 	console.log("req.url = " + req.url + ", pathname = " + uri);
 
@@ -41,25 +41,31 @@ var sendFile = function (filePath, res) {
 	});
 }
 
-var sendDirectoryView = function (filePath, res) {
-	console.log("the file is a directory " + filePath);
+var sendDirectoryView = function (dirPath, res) {
+	console.log("the file is a directory " + dirPath);
 
-	fs.readdir(filePath, function (err, files) {
+	StorageAccessor.getStatOfDirContents(dirPath, function (files, statses) {
+		for (var i = 0; i < files.length; i++) {
+			if (statses[i].isDirectory()) {
+				files[i] += '/';
+			}
+		}
+
+		sendFileListView(res, dirPath, files);
+	});
+}
+
+StorageAccessor.getStatOfDirContents = function (dirPath, callback) {
+	fs.readdir(dirPath, function (err, files) {
 		// this code can be refactored using promises
 		var absolutePaths = files.map(function (file) {
-			return path.join(filePath, file);
+			return path.join(dirPath, file);
 		});
 
 		getStatOfFiles(absolutePaths, function (statses) {
-			for (var i = 0; i < files.length; i++) {
-				if (statses[i].isDirectory()) {
-					files[i] += '/';
-				}
-			}
-
-			sendFileListView(res, filePath, files);
+			callback(files, statses);
 		});
-	});
+	});	
 }
 
 var getStatOfFiles = function (filePaths, callback) {
@@ -85,12 +91,12 @@ var getStatOfFiles = function (filePaths, callback) {
 	});
 }
 
-var getStoragePath = function () {
+StorageAccessor.getStoragePath = function () {
 	return path.join(process.cwd(), "storage");
 }
 
 var sendFileListView = function (res, filePath, files) {
-	var dir = path.relative(getStoragePath(), filePath);
+	var dir = path.relative(StorageAccessor.getStoragePath(), filePath);
 	res.send(view.renderFileList(dir, files));
 }
 
