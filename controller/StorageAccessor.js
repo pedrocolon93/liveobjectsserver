@@ -23,7 +23,7 @@ StorageAccessor.fileGetCallback = function (req, res) {
 		} else if (stats.isFile()) {
 			sendFile(filePath, res);
 		} else if (stats.isDirectory()) {
-			sendDirectoryView(filePath, res);
+			sendDirectoryView(res);
 		} else {
 			res.send("unknown file type " + filePath);
 		}
@@ -41,7 +41,7 @@ var sendFile = function (filePath, res) {
 	});
 }
 
-var sendDirectoryView = function (dirPath, res) {
+var sendDirectoryView = function (res) {
 	console.log("the file is a directory " + dirPath);
 
 	StorageAccessor.getStatOfDirContents(dirPath, function (fileStatses) {
@@ -50,7 +50,7 @@ var sendDirectoryView = function (dirPath, res) {
 				(fileStats.stats.isDirectory() ? '/' : '');
 		});
 
-		sendFileListView(res, dirPath, files);
+		sendFileListView(res, files);
 	});
 }
 
@@ -98,9 +98,8 @@ StorageAccessor.getStoragePath = function () {
 	return path.join(process.cwd(), "storage");
 }
 
-var sendFileListView = function (res, filePath, files) {
-	var dir = path.relative(StorageAccessor.getStoragePath(), filePath);
-	res.send(view.renderFileList(dir, files));
+var sendFileListView = function (res, files) {
+	res.send(view.renderFileList(files));
 }
 
 module.exports = StorageAccessor;

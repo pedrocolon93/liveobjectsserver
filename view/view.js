@@ -2,11 +2,11 @@ var path = require("path"),
 	fs = require('fs'),
 	jade = require("jade");
 
-var renderFileList = function (dir, files) {
+var renderFileList = function (files) {
 	console.log("files = " + files);
 
 	var jadePath = path.join(process.cwd(), "view", "files.jade");
-	var html = jade.renderFile(jadePath, {"dir": dir, "files": files});
+	var html = jade.renderFile(jadePath, {"files": files});
 	console.log("html = " + html);
 
 	return html;
