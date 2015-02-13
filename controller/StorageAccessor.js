@@ -23,7 +23,7 @@ StorageAccessor.fileGetCallback = function (req, res) {
 		} else if (stats.isFile()) {
 			sendFile(filePath, res);
 		} else if (stats.isDirectory()) {
-			sendDirectoryView(res);
+			sendDirectoryView(filePath, res);
 		} else {
 			res.send("unknown file type " + filePath);
 		}
@@ -41,9 +41,8 @@ var sendFile = function (filePath, res) {
 	});
 }
 
-var sendDirectoryView = function (res) {
-	console.log("the file is a directory " + dirPath);
-
+var sendDirectoryView = function (dirPath, res) {
+	console.log("dirPath = " + dirPath);
 	StorageAccessor.getStatOfDirContents(dirPath, function (fileStatses) {
 		files = fileStatses.map(function (fileStats) {
 			return fileStats.file +
