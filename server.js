@@ -1,6 +1,6 @@
 var http = require("http"),
 	express = require("express"),
-	StorageAccessor = require("./controller/storageAccessor.js"),
+	StorageAccessor = require("./controller/StorageAccessor.js"),
 	commandCgi = require("./controller/command-cgi.js"),
 	configCgi = require("./controller/config-cgi.js"),
 	uploadCgi = require("./controller/upload-cgi.js"),
