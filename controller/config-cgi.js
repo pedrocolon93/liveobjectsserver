@@ -23,8 +23,6 @@ configCgi.configExecutionCallback = function (req, res) {
 		return;
 	}
 
-    delete query.MASTERCODE;
-
     res.contentType('text/plain');
 
     configModel.Config.find({}, function (err, configs) {
@@ -37,18 +35,37 @@ configCgi.configExecutionCallback = function (req, res) {
         console.log("configs.length = " + configs.length);
         var config = configs.length > 0 ? configs[0] : new configModel.Config();
 
-        var invalidQueryExists = false;
-        Object.keys(query).forEach(function (queryString) {
-            var attributes = Object.keys(configModel.ConfigSchema.paths);
-            if (attributes.indexOf(queryString) == -1) {
-                console.log("invalid query string '" + queryString + "'");
-                console.log(attributes);
-                invalidQueryExists = true;
+        if (query.length == 1) {
+            // only MASTERCODE as a query string
+            config.MASTERCODE = query.MASTERCODE;
+        } else {
+            if (!(MASTERCODE in config)) {
+                console.log("set the MASTERCODE first");
+                res.send('ERROR');
                 return;
             }
 
-            config.queryString = query[queryString];
-        });
+            if (config.MASTERCODE != query.MASTERCODE) {
+                console.log("the given MASTERCODE doesn't correspond to the one in the database");
+                res.send('ERROR');
+                return;
+            }
+
+            delete.query.MASTERCODE;
+
+            var invalidQueryExists = false;
+            Object.keys(query).forEach(function (queryString) {
+                var attributes = Object.keys(configModel.ConfigSchema.paths);
+                if (attributes.indexOf(queryString) == -1) {
+                    console.log("invalid query string '" + queryString + "'");
+                    console.log(attributes);
+                    invalidQueryExists = true;
+                    return;
+                }
+
+                config.queryString = query[queryString];
+            });
+        }
 
         if (invalidQueryExists) {
             res.send('ERROR');
