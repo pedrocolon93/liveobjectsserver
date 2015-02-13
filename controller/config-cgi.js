@@ -35,11 +35,15 @@ configCgi.configExecutionCallback = function (req, res) {
         console.log("configs.length = " + configs.length);
         var config = configs.length > 0 ? configs[0] : new configModel.Config();
 
-        if (query.length == 1) {
+	console.log("---config1--");
+	console.log(config);
+	console.log("------------");
+
+        if (Object.keys(query).length == 1) {
             // only MASTERCODE as a query string
             config.MASTERCODE = query.MASTERCODE;
         } else {
-            if (!(MASTERCODE in config)) {
+            if (!('MASTERCODE' in config) || config.MASTERCODE == undefined) {
                 console.log("set the MASTERCODE first");
                 res.send('ERROR');
                 return;
@@ -47,11 +51,12 @@ configCgi.configExecutionCallback = function (req, res) {
 
             if (config.MASTERCODE != query.MASTERCODE) {
                 console.log("the given MASTERCODE doesn't correspond to the one in the database");
+		console.log("expected: " + config.MASTERCODE + ", specified: " + query.MASTERCODE);
                 res.send('ERROR');
                 return;
             }
 
-            delete.query.MASTERCODE;
+            delete query.MASTERCODE;
 
             var invalidQueryExists = false;
             Object.keys(query).forEach(function (queryString) {
@@ -63,7 +68,7 @@ configCgi.configExecutionCallback = function (req, res) {
                     return;
                 }
 
-                config.queryString = query[queryString];
+                config[queryString] = query[queryString];
             });
         }
 
@@ -71,6 +76,10 @@ configCgi.configExecutionCallback = function (req, res) {
             res.send('ERROR');
             return;
         }
+
+	console.log("---config2--");
+	console.log(config);
+	console.log("------------");
 
         config.save(function (err) {
             if (err) {
