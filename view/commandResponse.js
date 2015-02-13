@@ -2,9 +2,9 @@ var path = require("path"),
 	fs = require('fs'),
 	sprintf = require('sprintf').sprintf;
 
-view = {}
+commandResponse = {}
 
-view.createFileList = function (dir, fileStatses) {
+commandResponse.createFileList = function (dir, fileStatses) {
 	console.log(fileStatses);
 
 	var fileList = "WLANSD_FILELIST\r\n";
@@ -50,4 +50,4 @@ var buildTime = function (stats) {
 	return bits;
 }
 
-module.exports = view;
+module.exports = commandResponse;
