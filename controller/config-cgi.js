@@ -77,16 +77,23 @@ configCgi.configExecutionCallback = function (req, res) {
             return;
         }
 
-	console.log("---config2--");
-	console.log(config);
-	console.log("------------");
+    	console.log("---config2--");
+    	console.log(config);
+    	console.log("------------");
 
         config.save(function (err) {
             if (err) {
                 console.log(err);
                 res.send('ERROR');
             } else {
-                res.send('SUCCESS');
+                configSync.syncHostapd(function (err) {
+                    if (err) {
+                        console.log(err);
+                        res.send('ERROR');
+                    } else {
+                        res.send('SUCCESS');
+                    }
+                });
             }
         });
     });
