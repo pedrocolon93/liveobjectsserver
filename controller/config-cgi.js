@@ -35,11 +35,13 @@ configCgi.configExecutionCallback = function (req, res) {
         console.log("configs.length = " + configs.length);
         var config = configs.length > 0 ? configs[0] : new configModel.Config();
 
+        console.log(query);
+        
         if (query.length == 1) {
             // only MASTERCODE as a query string
             config.MASTERCODE = query.MASTERCODE;
         } else {
-            if (!(MASTERCODE in config)) {
+            if (!(MASTERCODE in config) || config.MASTERCODE == undefined) {
                 console.log("set the MASTERCODE first");
                 res.send('ERROR');
                 return;
@@ -47,6 +49,7 @@ configCgi.configExecutionCallback = function (req, res) {
 
             if (config.MASTERCODE != query.MASTERCODE) {
                 console.log("the given MASTERCODE doesn't correspond to the one in the database");
+                console.log("expected: " + config.MASTERCODE + ", specified: " + query.MASTERCODE);
                 res.send('ERROR');
                 return;
             }
