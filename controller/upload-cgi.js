@@ -61,22 +61,30 @@ Uploader.uploadFormCallback = function (req, res) {
 };
 
 Uploader.uploadFileCallback = function (req, res) {
-	var form = new multiparty.Form({uploadDir: path.join(__dirname, "../tmp")});
+	var tmpDir = path.join(__dirname, "../tmp");
+	fs.mkdir(tmpDir, function (err) {
+		if (err && err.code != 'EEXIST') {
+			console.log('failed to make tmp dir');
+			throw err;
+		}
 
-	form.on("file", function (name, file) {
-		console.log(name);
-		console.log(file);
+		var form = new multiparty.Form({uploadDir: tmpDir});
 
-		var tmpPath = file.path;
-		var uploadPath = path.join(
-			storagePath, uploadQuery.UPDIR.value, file.originalFilename);
-		console.log("uploadPath := " + uploadPath);
-		fs.renameSync(tmpPath, uploadPath);
+		form.on("file", function (name, file) {
+			console.log(name);
+			console.log(file);
 
-		res.send("success");
+			var tmpPath = file.path;
+			var uploadPath = path.join(
+				storagePath, uploadQuery.UPDIR.value, file.originalFilename);
+			console.log("uploadPath := " + uploadPath);
+			fs.renameSync(tmpPath, uploadPath);
+	
+			res.send("success");
+		});
+	
+		form.parse(req);
 	});
-
-	form.parse(req);
 };
 
 function createUpdir (dir, callback) {
