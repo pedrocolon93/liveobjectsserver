@@ -94,7 +94,17 @@ var getStatOfFiles = function (filePaths, callback) {
 }
 
 StorageAccessor.getStoragePath = function () {
-	return path.join(process.cwd(), "storage");
+    var storageDir = 'storage';
+
+    try {
+        fs.mkdirSync(storageDir);
+    } catch (err) {
+        if (err.code !== 'EEXIST') {
+            throw err.code;
+        }
+    }
+
+	return path.join(process.cwd(), storageDir);
 }
 
 var sendFileListView = function (res, files) {
