@@ -4,9 +4,7 @@ var url = require("url"),
 	os = require("os"),
 	view = require("../view/view.js");
 
-StorageAccessor = {};
-
-StorageAccessor.fileGetCallback = function (req, res) {
+exports.fileGetCallback = function (req, res) {
 	var uri = url.parse(req.url).pathname;
 	var filePath = path.join(StorageAccessor.getStoragePath(), uri);
 
@@ -53,7 +51,7 @@ var sendDirectoryView = function (dirPath, res) {
 	});
 }
 
-StorageAccessor.getStatOfDirContents = function (dirPath, callback) {
+exports.getStatOfDirContents = function (dirPath, callback) {
 	fs.readdir(dirPath, function (err, files) {
 		// this code can be refactored using promises
 		var absolutePaths = files.map(function (file) {
@@ -93,7 +91,7 @@ var getStatOfFiles = function (filePaths, callback) {
 	});
 }
 
-StorageAccessor.getStoragePath = function () {
+exports.getStoragePath = function () {
     var storageDir = 'storage';
 
     try {
@@ -110,5 +108,3 @@ StorageAccessor.getStoragePath = function () {
 var sendFileListView = function (res, files) {
 	res.send(view.renderFileList(files));
 }
-
-module.exports = StorageAccessor;

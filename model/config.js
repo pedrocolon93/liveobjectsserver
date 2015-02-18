@@ -1,8 +1,6 @@
 var mongoose = require('mongoose');
 
-var config = {};
-
-config.connect = function (callback) {
+exports.connect = function (callback) {
 	mongoose.connect('mongodb://localhost/flashair-compat-server');
 	mongoose.connection.on("open", function () {
 		config.Config = mongoose.model("Config", config.ConfigSchema);
@@ -11,7 +9,7 @@ config.connect = function (callback) {
 	});
 }
 
-config.ConfigSchema = mongoose.Schema({
+exports.ConfigSchema = mongoose.Schema({
 	APPAUTOTIME: 	Number,
 	APPINFO: String,
 	APPMODE: { type: Number, default: 4 },
@@ -34,5 +32,3 @@ config.ConfigSchema = mongoose.Schema({
 	VENDOR: { type: String, default: 'MIT Media Lab' },
 	VERSION: String
 });
-
-module.exports = config;

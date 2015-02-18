@@ -14,9 +14,7 @@ var uploadQuery = {
 
 var storagePath = path.join(__dirname, "../storage");
 
-Uploader = {};
-
-Uploader.uploadFormCallback = function (req, res) {
+exports.uploadFormCallback = function (req, res) {
 	console.log("query = " + JSON.stringify(req.query));
 
 	if (Object.keys(req.query).length > 0) {
@@ -60,7 +58,7 @@ Uploader.uploadFormCallback = function (req, res) {
 	}
 };
 
-Uploader.uploadFileCallback = function (req, res) {
+exports.uploadFileCallback = function (req, res) {
 	var tmpDir = path.join(__dirname, "../tmp");
 	fs.mkdir(tmpDir, function (err) {
 		if (err && err.code != 'EEXIST') {
@@ -123,5 +121,3 @@ function deleteFile (filePath, callback) {
 		});
 	});
 }
-
-module.exports = Uploader;

@@ -1,12 +1,11 @@
 var fs = require('fs'),
     plainConfig = require('../model/plain-config.js');
 
-var configSync = {};
 var configFilename = {
     hostapd: '/etc/hostapd/hostapd.conf'
 }
 
-configSync.syncHostapd = function (config, callback) {
+exports.syncHostapd = function (config, callback) {
     try {
         checkIfFileExists(configFilename.hostapd);
     } catch (err) {
@@ -47,5 +46,3 @@ function checkIfFileExists(filename) {
         throw err;
     }
 }
-
-module.exports = configSync;

@@ -2,7 +2,7 @@ var path = require("path"),
 	fs = require('fs'),
 	jade = require("jade");
 
-var renderFileList = function (files) {
+exports.renderFileList = function (files) {
 	console.log("files = " + files);
 
 	var jadePath = path.join(process.cwd(), "view", "files.jade");
@@ -12,11 +12,6 @@ var renderFileList = function (files) {
 	return html;
 }
 
-var renderUploadForm = function () {
+exports.renderUploadForm = function () {
 	return fs.readFileSync("view/upload.html", {"encoding": "utf8"});
 }
-
-view = {}
-view.renderFileList = renderFileList;
-view.renderUploadForm = renderUploadForm;
-module.exports = view;

@@ -7,8 +7,6 @@ var url = require("url"),
 	commandResponse = require("../view/commandResponse.js");
 	view = require("../view/view.js");
 
-command = {};
-
 var commands = {
 	'100' : { func: getFileList, params: [ "DIR" ] },
 	'101' : { func: getNumFiles, params: [ "DIR" ] },
@@ -35,7 +33,7 @@ var commands = {
 // '203' not implemented
 };
 
-command.commandExecutionCallback = function (req, res) {
+exports.commandExecutionCallback = function (req, res) {
 	var query = req.query;
 	var op = query.op;
 
@@ -112,6 +110,3 @@ function getWlanTimeout (query, callback) {
 function isUploadEnabled (query, callback) {
 	callback('1'); // placeholder
 }
-
-
-module.exports = command;

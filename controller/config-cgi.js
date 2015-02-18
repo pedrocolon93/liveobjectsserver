@@ -10,9 +10,7 @@ var url = require("url"),
 	view = require("../view/view.js"),
     configSync = require("./config-sync.js");
 
-configCgi = {};
-
-configCgi.configExecutionCallback = function (req, res) {
+exports.configExecutionCallback = function (req, res) {
 	var query = req.query;
 	var masterCode = query.MASTERCODE;
 
@@ -91,5 +89,3 @@ configCgi.configExecutionCallback = function (req, res) {
         });
     });
 }
-
-module.exports = configCgi;

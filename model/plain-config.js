@@ -1,9 +1,7 @@
 var fs = require('fs');
 var os = require('os');
 
-var plainConfig = {};
-
-plainConfig.read = function (filename, callback) {
+exports.read = function (filename, callback) {
     fs.readFile(filename, function (err, data) {
         if (err) {
             console.log(err);
@@ -24,7 +22,7 @@ plainConfig.read = function (filename, callback) {
     });
 }
     
-plainConfig.write = function (filename, data, callback) {
+exports.write = function (filename, data, callback) {
     var lines = '';
 
     Object.keys(data).forEach(function (param) {
@@ -39,5 +37,3 @@ plainConfig.write = function (filename, data, callback) {
         callback(err);
     });
 }
-
-module.exports = plainConfig;
