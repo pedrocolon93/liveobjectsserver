@@ -4,10 +4,11 @@ var url = require("url"),
 	os = require("os"),
 	multiparty = require("multiparty"),
     mongoose = require("mongoose"),
-	StorageAccessor = require("./StorageAccessor.js");
-	commandResponse = require("../view/commandResponse.js");
-    configModel = require("../model/config.js");
-	view = require("../view/view.js");
+	StorageAccessor = require("./StorageAccessor.js"),
+	commandResponse = require("../view/commandResponse.js"),
+    configModel = require("../model/config.js"),
+	view = require("../view/view.js"),
+    configSync = require("./config-sync.js");
 
 configCgi = {};
 
@@ -34,10 +35,6 @@ configCgi.configExecutionCallback = function (req, res) {
 
         console.log("configs.length = " + configs.length);
         var config = configs.length > 0 ? configs[0] : new configModel.Config();
-
-    	console.log("---config1--");
-    	console.log(config);
-    	console.log("------------");
 
         if (Object.keys(query).length == 1) {
             // only MASTERCODE as a query string
@@ -70,23 +67,19 @@ configCgi.configExecutionCallback = function (req, res) {
 
                 config[queryString] = query[queryString];
             });
-        }
 
-        if (invalidQueryExists) {
-            res.send('ERROR');
-            return;
+            if (invalidQueryExists) {
+                res.send('ERROR');
+                return;
+            }
         }
-
-    	console.log("---config2--");
-    	console.log(config);
-    	console.log("------------");
 
         config.save(function (err) {
             if (err) {
                 console.log(err);
                 res.send('ERROR');
             } else {
-                configSync.syncHostapd(function (err) {
+                configSync.syncHostapd(config, function (err) {
                     if (err) {
                         console.log(err);
                         res.send('ERROR');

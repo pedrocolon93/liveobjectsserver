@@ -1,23 +1,30 @@
-var plainConfig = require('../model/plain-config.js')
+var fs = require('fs'),
+    plainConfig = require('../model/plain-config.js');
 
 var configSync = {};
 var configFilename = {
     hostapd: '/etc/hostapd/hostapd.conf'
 }
 
-configSync.syncHostapd = function (err, config) {
-    checkIfFileExists(configFilename.hostApd);
+configSync.syncHostapd = function (config, callback) {
+    try {
+        checkIfFileExists(configFilename.hostapd);
+    } catch (err) {
+        callback(err);
+        return;
+    }
 
-    plainConfig.read(configFilename.hostApd, function (err, params) {
+    plainConfig.read(configFilename.hostapd, function (err, params) {
         if (err) {
             console.log(err);
             callback(err);
+            return;
         }
 
         params.ssid = config.APPSSID;
         params.wpa_passphrase = config.APPNETWORKKEY;
 
-        plainConfig.write(configFilename.hostApd, function (err) {
+        plainConfig.write(configFilename.hostapd, function (err) {
             if (err) {
                 console.log(err);
                 callback(err);
@@ -25,18 +32,18 @@ configSync.syncHostapd = function (err, config) {
 
             console.log("updated hostapd config");
             callback(null);
-        }
+        });
     });
 }
 
 function checkIfFileExists(filename) {
     try {
-        var fileStat = fs.statSync(configFilename.hostApd);
+        var fileStat = fs.statSync(filename);
         if (!isFile) {
-            throw configFilename.hostApd + " must be a file";
+            throw filename + " must be a file";
         }
-    } catch {
-        console.log(configFilename.hostApd + " doesn't exist");
+    } catch (err) {
+        console.log(filename + " doesn't exist");
         throw err;
     }
 }
