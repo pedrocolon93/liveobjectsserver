@@ -6,7 +6,7 @@ var url = require("url"),
 
 exports.fileGetCallback = function (req, res) {
 	var uri = url.parse(req.url).pathname;
-	var filePath = path.join(StorageAccessor.getStoragePath(), uri);
+	var filePath = path.join(exports.getStoragePath(), uri);
 
 	console.log("req.url = " + req.url + ", pathname = " + uri);
 
@@ -41,7 +41,7 @@ var sendFile = function (filePath, res) {
 
 var sendDirectoryView = function (dirPath, res) {
 	console.log("dirPath = " + dirPath);
-	StorageAccessor.getStatOfDirContents(dirPath, function (fileStatses) {
+	exports.getStatOfDirContents(dirPath, function (fileStatses) {
 		files = fileStatses.map(function (fileStats) {
 			return fileStats.file +
 				(fileStats.stats.isDirectory() ? '/' : '');

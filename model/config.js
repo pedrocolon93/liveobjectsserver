@@ -3,10 +3,22 @@ var mongoose = require('mongoose');
 exports.connect = function (callback) {
 	mongoose.connect('mongodb://localhost/flashair-compat-server');
 	mongoose.connection.on("open", function () {
-		config.Config = mongoose.model("Config", config.ConfigSchema);
+		exports.Config = mongoose.model("Config", exports.ConfigSchema);
 
 		callback();
 	});
+}
+
+exports.getConfig = function (callback) {
+    exports.Config.find({}, function (err, configs) {
+        if (err) {
+            callback(err);
+            return;
+        }
+
+        var config = configs.length > 0 ? configs[0] : new configModel.Config();
+        callback(null, config);
+    });         
 }
 
 exports.ConfigSchema = mongoose.Schema({

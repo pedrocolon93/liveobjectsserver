@@ -24,15 +24,12 @@ exports.configExecutionCallback = function (req, res) {
 
     res.contentType('text/plain');
 
-    configModel.Config.find({}, function (err, configs) {
+    configModel.getConfig(function (err, config) {
         if (err) {
             console.log(err);
             res.send('ERROR');
             return;
         }
-
-        console.log("configs.length = " + configs.length);
-        var config = configs.length > 0 ? configs[0] : new configModel.Config();
 
         if (Object.keys(query).length == 1) {
             // only MASTERCODE as a query string

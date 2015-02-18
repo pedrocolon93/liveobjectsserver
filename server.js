@@ -17,5 +17,5 @@ configModel.connect(function () {
 	app.get("/upload.cgi", uploadCgi.uploadFormCallback);
 	app.get("/*", StorageAccessor.fileGetCallback);
 
-	app.post("/upload.cgi", Uploader.uploadFileCallback);
+	app.post("/upload.cgi", uploadCgi.uploadFileCallback);
 });
