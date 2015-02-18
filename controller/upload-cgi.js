@@ -6,7 +6,7 @@ var url = require("url"),
 	view = require("../view/view.js");
 
 var uploadQuery = {
-		UPDIR: {type: 'string', value: "/", postSetting: createUpdir},
+		UPDIR: {type: 'string', value: "/", postSetting: setUpdir},
 		FTIME: {type: 'number', value: 0, postSetting: null},
 		WRITEPROTECT: {type: 'boolean', value: false, postSetting: null},
 		DEL: {type: 'string', value: null, postSetting: deleteFile}
@@ -85,13 +85,21 @@ exports.uploadFileCallback = function (req, res) {
 	});
 };
 
-function createUpdir (dir, callback) {
-	console.log("createUpdir() called");
+function setUpdir (dir, callback) {
+	console.log("setUpdir() called");
 
 	var absoluteDir = path.join(storagePath, dir);
 
 	fs.mkdir(absoluteDir, function (err) {
-		callback(err);
+        if (err && err.code != 'EEXIST') {
+            callback(err);
+        }
+
+        if (!err) {
+            console.log("created a new upload dir '" + absoluteDir + "'");
+        }
+
+		callback(null);
 	});
 }
 
