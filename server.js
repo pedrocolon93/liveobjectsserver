@@ -9,13 +9,13 @@ var http = require("http"),
 app = express();
 app.use(express.static(__dirname + '/public'));
 
-http.createServer(app).listen(3000);
+app.get("/command.cgi", commandCgi.commandExecutionCallback);
+app.get("/config.cgi", configCgi.configExecutionCallback);
+app.get("/upload.cgi", uploadCgi.uploadFormCallback);
+app.get("/*", StorageAccessor.fileGetCallback);
+
+app.post("/upload.cgi", uploadCgi.uploadFileCallback);
 
 configModel.connect(function () {
-	app.get("/command.cgi", commandCgi.commandExecutionCallback);
-	app.get("/config.cgi", configCgi.configExecutionCallback);
-	app.get("/upload.cgi", uploadCgi.uploadFormCallback);
-	app.get("/*", StorageAccessor.fileGetCallback);
-
-	app.post("/upload.cgi", uploadCgi.uploadFileCallback);
+    http.createServer(app).listen(3000);
 });

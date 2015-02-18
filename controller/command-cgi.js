@@ -5,7 +5,8 @@ var url = require("url"),
 	multiparty = require("multiparty"),
 	StorageAccessor = require("./StorageAccessor.js");
 	commandResponse = require("../view/commandResponse.js");
-	view = require("../view/view.js");
+	view = require("../view/view.js"),
+	config = require("../model/config.js");
 
 var commands = {
 	'100' : { func: getFileList, params: [ "DIR" ] },
@@ -88,6 +89,12 @@ function isUpdated (query, callback) {
 }
 
 function getSsid (query, callback) {
+	config.getConfig(function (err) {
+		if (err) {
+			callback(err);
+		}
+
+	});
 	callback('dummy-ssid'); // placeholder
 }
 
