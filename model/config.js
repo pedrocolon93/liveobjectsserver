@@ -16,7 +16,7 @@ exports.getConfig = function (callback) {
             return;
         }
 
-        var config = configs.length > 0 ? configs[0] : new configModel.Config();
+        var config = configs.length > 0 ? configs[0] : new exports.Config();
         callback(null, config);
     });         
 }
