@@ -39,7 +39,6 @@ exports.commandExecutionCallback = function (req, res) {
 	var op = query.op;
 
 	console.log(query);
-
 	if (!op) {
 		console.log("op is not specified as a query string");
 		res.sendStatus(404);
@@ -60,7 +59,13 @@ exports.commandExecutionCallback = function (req, res) {
 
 	res.contentType('text/plain');
 
-	commands[op].func(query, function (message) {
+	commands[op].func(query, function (err, message) {
+        if (err) {
+            console.log("failed to execute the command (op=" + op + ")");
+            res.sendStatus(500);
+            return;
+        }
+
 		res.send(message);
 	});
 }
@@ -71,7 +76,7 @@ function getFileList (query, callback) {
 
 	StorageAccessor.getStatOfDirContents(absoluteDir, function (fileStatses) {
 		var fileList = commandResponse.createFileList(query.DIR, fileStatses);
-		callback(fileList);
+		callback(null, fileList);
 	});
 }
 
@@ -79,41 +84,41 @@ function getNumFiles (query, callback) {
 	var absoluteDir = path.join(StorageAccessor.getStoragePath(), query.DIR);
 
 	StorageAccessor.getStatOfDirContents(absoluteDir, function (fileStatses) {
-		callback(fileStatses.length.toString());
+		callback(null, fileStatses.length.toString());
 	});
 }
 
 function isUpdated (query, callback) {
 	// always returns 0 ('not updated')
-	callback('0');
+	callback(null, '0');
 }
 
 function getSsid (query, callback) {
-	config.getConfig(function (err) {
+	config.getConfig(function (err, config) {
 		if (err) {
 			callback(err);
 		}
 
+        callback(null, config.APPSSID);
 	});
-	callback('dummy-ssid'); // placeholder
 }
 
 function getNetworkPassword (query, callback) {
-	callback('12345678'); // placeholder
+	callback(null, '12345678'); // placeholder
 }
 
 function getClientMacAddress (query, callback) {
-	callback('aabbccddeeff'); // placeholder
+	callback(null, 'aabbccddeeff'); // placeholder
 }
 
 function getWlanMode (query, callback) {
-	callback('4'); // placeholder
+	callback(null, '4'); // placeholder
 }
 
 function getWlanTimeout (query, callback) {
-	callback('0'); // placeholder
+	callback(null, '0'); // placeholder
 }
 
 function isUploadEnabled (query, callback) {
-	callback('1'); // placeholder
+	callback(null, '1'); // placeholder
 }
