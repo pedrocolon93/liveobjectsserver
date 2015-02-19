@@ -12,16 +12,16 @@ var commands = {
 	'100' : { func: getFileList, params: [ "DIR" ] },
 	'101' : { func: getNumFiles, params: [ "DIR" ] },
 	'102' : { func: isUpdated, params: null},
-	'104' : { func: getSsid, params: null},
-	'105' : { func: getNetworkPassword, params: null},
+	'104' : { func: configParamGetter('APPNAME'), params: null},
+	'105' : { func: configParamGetter('APPNETWORKKEY'), params: null},
 	'106' : { func: getClientMacAddress, params: null},
 //	'107' not implemented
 //  '108' not implemented
 //  '109' not implemented
-	'110' : { func: getWlanMode, param: null},
-	'111' : { func: getWlanTimeout, param: null},
+	'110' : { func: configParamGetter('APPMODE'), param: null},
+	'111' : { func: configParamGetter('APPAUTOTIME'), param: null},
 // '117' not implemented
-	'118' : { func: isUploadEnabled, param: null}
+	'118' : { func: configParamGetter('UPLOAD'), param: null}
 // '120' not implemented
 // '121' not implemented
 // '130' not implemented
@@ -93,56 +93,18 @@ function isUpdated (query, callback) {
 	callback(null, '0');
 }
 
-function getSsid (query, callback) {
-	config.getConfig(function (err, config) {
-		if (err) {
-			callback(err);
-		}
-
-        callback(null, config.APPSSID);
-	});
-}
-
-function getNetworkPassword (query, callback) {
-	config.getConfig(function (err, config) {
-		if (err) {
-			callback(err);
-		}
-
-        callback(null, config.APPNETWORKKEY);
-	});
-}
-
 function getClientMacAddress (query, callback) {
 	callback(null, 'aabbccddeeff'); // placeholder
 }
 
-function getWlanMode (query, callback) {
-	config.getConfig(function (err, config) {
-		if (err) {
-			callback(err);
-		}
+function configParamGetter (paramName) {
+	return function (query, callback) {
+        config.getConfig(function (err, config) {
+	    	if (err) {
+    			callback(err);
+    		}
 
-        callback(null, config.APPMODE);
-	});
-}
-
-function getWlanTimeout (query, callback) {
-	config.getConfig(function (err, config) {
-		if (err) {
-			callback(err);
-		}
-
-        callback(null, config.APPAUTOTIME);
-	});
-}
-
-function isUploadEnabled (query, callback) {
-	config.getConfig(function (err, config) {
-		if (err) {
-			callback(err);
-		}
-
-        callback(null, config.UPLOAD);
-	});
+            callback(null, config[paramName]);
+    	});
+    };
 }
