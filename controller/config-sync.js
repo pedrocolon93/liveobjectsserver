@@ -6,13 +6,6 @@ var configFilename = {
 }
 
 exports.syncHostapd = function (config, callback) {
-    try {
-        checkIfFileExists(configFilename.hostapd);
-    } catch (err) {
-        callback(err);
-        return;
-    }
-
     plainConfig.read(configFilename.hostapd, function (err, params) {
         if (err) {
             console.log(err);
@@ -23,26 +16,15 @@ exports.syncHostapd = function (config, callback) {
         params.ssid = config.APPSSID;
         params.wpa_passphrase = config.APPNETWORKKEY;
 
-        plainConfig.write(configFilename.hostapd, function (err) {
+        plainConfig.write(configFilename.hostapd, params, function (err) {
             if (err) {
                 console.log(err);
                 callback(err);
+                return;
             }
 
             console.log("updated hostapd config");
             callback(null);
         });
     });
-}
-
-function checkIfFileExists(filename) {
-    try {
-        var fileStat = fs.statSync(filename);
-        if (!isFile) {
-            throw filename + " must be a file";
-        }
-    } catch (err) {
-        console.log(filename + " doesn't exist");
-        throw err;
-    }
 }
