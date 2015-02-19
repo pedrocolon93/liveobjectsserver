@@ -15,6 +15,7 @@ exports.syncHostapd = function (config, callback) {
 
         params.ssid = config.APPSSID;
         params.wpa_passphrase = config.APPNETWORKKEY;
+        params.channel = config.APPCHANNEL;
 
         plainConfig.write(configFilename.hostapd, params, function (err) {
             if (err) {
