@@ -104,7 +104,13 @@ function getSsid (query, callback) {
 }
 
 function getNetworkPassword (query, callback) {
-	callback(null, '12345678'); // placeholder
+	config.getConfig(function (err, config) {
+		if (err) {
+			callback(err);
+		}
+
+        callback(null, config.APPNETWORKKEY);
+	});
 }
 
 function getClientMacAddress (query, callback) {
@@ -112,13 +118,31 @@ function getClientMacAddress (query, callback) {
 }
 
 function getWlanMode (query, callback) {
-	callback(null, '4'); // placeholder
+	config.getConfig(function (err, config) {
+		if (err) {
+			callback(err);
+		}
+
+        callback(null, config.APPMODE);
+	});
 }
 
 function getWlanTimeout (query, callback) {
-	callback(null, '0'); // placeholder
+	config.getConfig(function (err, config) {
+		if (err) {
+			callback(err);
+		}
+
+        callback(null, config.APPAUTOTIME);
+	});
 }
 
 function isUploadEnabled (query, callback) {
-	callback(null, '1'); // placeholder
+	config.getConfig(function (err, config) {
+		if (err) {
+			callback(err);
+		}
+
+        callback(null, config.UPLOAD);
+	});
 }
