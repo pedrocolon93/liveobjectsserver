@@ -16,11 +16,11 @@ var commands = {
     '105' : { func: configParamGetter('APPNETWORKKEY'), params: null },
     '106' : { func: getClientMacAddress, params: null },
 //  '107' not implemented
-//  '108' not implemented
+    '108' : { func: configParamGetter('VERSION'), param: null },
 //  '109' not implemented
     '110' : { func: configParamGetter('APPMODE'), param: null },
     '111' : { func: configParamGetter('APPAUTOTIME'), param: null },
-// '117' not implemented
+    '117' : { func: configParamGetter('APPINFO'), param: null },
     '118' : { func: configParamGetter('UPLOAD'), param: null }
 // '120' not implemented
 // '121' not implemented
