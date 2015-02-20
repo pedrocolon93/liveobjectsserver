@@ -5,7 +5,7 @@ var path = require("path"),
 exports.renderFileList = function (files) {
     console.log("files = " + files);
 
-    var jadePath = path.join(process.cwd(), "view", "files.jade");
+    var jadePath = path.join(__dirname, "files.jade");
     var html = jade.renderFile(jadePath, {"files": files});
     console.log("html = " + html);
 

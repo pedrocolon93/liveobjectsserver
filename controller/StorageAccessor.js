@@ -92,7 +92,7 @@ var getStatOfFiles = function (filePaths, callback) {
 }
 
 exports.getStoragePath = function () {
-    var storageDir = 'storage';
+    var storageDir = path.join(__dirname, '..', 'storage');
 
     try {
         fs.mkdirSync(storageDir);
@@ -102,7 +102,7 @@ exports.getStoragePath = function () {
         }
     }
 
-	return path.join(process.cwd(), storageDir);
+	return storageDir;
 }
 
 var sendFileListView = function (res, files) {
