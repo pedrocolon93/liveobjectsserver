@@ -4,6 +4,7 @@ var http = require("http"),
     commandCgi = require("./controller/command-cgi.js"),
     configCgi = require("./controller/config-cgi.js"),
     uploadCgi = require("./controller/upload-cgi.js"),
+    actionCgi = require("./controller/action-cgi.js"),
     configModel = require("./model/config.js");
 
 app = express();
@@ -15,6 +16,8 @@ app.get("/upload.cgi", uploadCgi.uploadFormCallback);
 app.get("/*", StorageAccessor.fileGetCallback);
 
 app.post("/upload.cgi", uploadCgi.uploadFileCallback);
+
+app.get("/action.cgi", actionCgi.actionExecutionCallback);
 
 configModel.connect(function () {
     http.createServer(app).listen(3000);
