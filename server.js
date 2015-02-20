@@ -13,11 +13,11 @@ app.use(express.static(__dirname + '/public'));
 app.get("/command.cgi", commandCgi.commandExecutionCallback);
 app.get("/config.cgi", configCgi.configExecutionCallback);
 app.get("/upload.cgi", uploadCgi.uploadFormCallback);
+app.get("/action.cgi", actionCgi.actionExecutionCallback);
 app.get("/*", StorageAccessor.fileGetCallback);
 
 app.post("/upload.cgi", uploadCgi.uploadFileCallback);
 
-app.get("/action.cgi", actionCgi.actionExecutionCallback);
 
 configModel.connect(function () {
     http.createServer(app).listen(3000);
