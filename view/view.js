@@ -13,5 +13,6 @@ exports.renderFileList = function (files) {
 }
 
 exports.renderUploadForm = function () {
-    return fs.readFileSync("view/upload.html", {"encoding": "utf8"});
+    var formPath = path.join(__dirname, "view/upload.html");
+    return fs.readFileSync(formPath, {"encoding": "utf8"});
 }
