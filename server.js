@@ -20,5 +20,6 @@ app.post("/upload.cgi", uploadCgi.uploadFileCallback);
 
 
 configModel.connect(function () {
-    http.createServer(app).listen(80);
+    console.log(process.argv[2]);
+    http.createServer(app).listen(80, process.argv[2]);
 });
