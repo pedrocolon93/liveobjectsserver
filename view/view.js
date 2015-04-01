@@ -21,3 +21,10 @@ exports.renderConfigTestPage = function () {
     var pagePath = path.join(__dirname, "config.html");
     return fs.readFileSync(pagePath, {"encoding": "utf8"});
 }
+
+exports.renderCommandTestPage = function (commands) {
+    var jadePath = path.join(__dirname, "commands.jade");
+    var html = jade.renderFile(jadePath, {"commands": commands});
+
+    return html;
+}

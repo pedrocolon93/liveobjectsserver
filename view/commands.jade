@@ -1,0 +1,9 @@
+doctype html
+html
+	head
+		title the list of commands
+	body
+		ul
+			each command in commands
+				li
+					a(href='command.cgi?op=#{command.op}') #{command.desc}

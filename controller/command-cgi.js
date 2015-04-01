@@ -8,20 +8,31 @@ var url = require("url"),
     view = require("../view/view.js"),
     config = require("../model/config.js");
 
-var commands = {
-    '100' : { func: getFileList, params: [ "DIR" ] },
-    '101' : { func: getNumFiles, params: [ "DIR" ] },
-    '102' : { func: isUpdated, params: null },
-    '104' : { func: configParamGetter('APPSSID'), params: null },
-    '105' : { func: configParamGetter('APPNETWORKKEY'), params: null },
-    '106' : { func: getClientMacAddress, params: null },
+var commands = [
+    { desc: 'get file list',
+        op: 100, func: getFileList, params: [ "DIR" ] },
+    { desc: 'get num files',
+        op: 101, func: getNumFiles, params: [ "DIR" ] },
+    { desc: 'is updated',
+        op: 102, func: isUpdated, params: null },
+    { desc: 'get APPSSID',
+        op: 104, func: configParamGetter('APPSSID'), params: null },
+    { desc: 'get APPNETWORKKEY',
+        op: 105, func: configParamGetter('APPNETWORKKEY'), params: null },
+    { desc: 'get client MAC addr',
+        op: 106, func: getClientMacAddress, params: null },
 //  '107' not implemented
-    '108' : { func: configParamGetter('VERSION'), param: null },
+    { desc: 'get VERSION',
+        op: 108, func: configParamGetter('VERSION'), param: null },
 //  '109' not implemented
-    '110' : { func: configParamGetter('APPMODE'), param: null },
-    '111' : { func: configParamGetter('APPAUTOTIME'), param: null },
-    '117' : { func: configParamGetter('APPINFO'), param: null },
-    '118' : { func: configParamGetter('UPLOAD'), param: null }
+    { desc: 'get APPMODE',
+        op: 110, func: configParamGetter('APPMODE'), param: null },
+    { desc: 'get APPAUTOTIME',
+        op: 111, func: configParamGetter('APPAUTOTIME'), param: null },
+    { desc: 'get APPINFO',
+        op: 117, func: configParamGetter('APPINFO'), param: null },
+    { desc: 'get UPLOAD',
+        op: 118, func: configParamGetter('UPLOAD'), param: null }
 // '120' not implemented
 // '121' not implemented
 // '130' not implemented
@@ -32,10 +43,24 @@ var commands = {
 // '201' not implemented
 // '202' not implemented
 // '203' not implemented
-};
+];
 
 exports.commandExecutionCallback = function (req, res) {
-var query = req.query;
+    var query = req.query;
+
+    if (Object.keys(query).length == 0) {
+        displayCommandTestPage(res);
+    } else {
+        processQuery(query, res);
+    }
+}
+
+function displayCommandTestPage(res) {
+    res.contentType('text/html');
+    res.send(view.renderCommandTestPage(commands));
+}
+
+function processQuery (query, res) {
     var op = query.op;
 
     console.log(query);
@@ -45,7 +70,17 @@ var query = req.query;
         return;
     }
 
-    if (commands[op].params) {
+    var command = commands.filter(function (x) {
+        return (x.op == op);
+    })[0];
+
+    if (command == undefined) {
+        console.log("command(op=" + op + ") is not defined");
+        res.sendStatus(404);
+        return;
+    }
+
+    if (command.params) {
         var allQueriesExist = commands[op].params.reduce(function (accum, param) {
             return accum && (param in query);
         }, true);
@@ -59,7 +94,7 @@ var query = req.query;
 
     res.contentType('text/plain');
 
-    commands[op].func(query, function (err, message) {
+    command.func(query, function (err, message) {
         if (err) {
             console.log("failed to execute the command (op=" + op + ")");
             res.sendStatus(500);
