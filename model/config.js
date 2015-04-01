@@ -44,5 +44,5 @@ exports.ConfigSchema = mongoose.Schema({
     VENDOR: { type: String, default: 'MIT Media Lab' },
     VERSION: String,
 
-    APPCHANNEL: { type: Number, min: 0, max: 14 }
+    APPCHANNEL: { type: Number, min: 0, max: 14, default: 1 }
 });
