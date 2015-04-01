@@ -31,58 +31,80 @@ exports.configExecutionCallback = function (req, res) {
             return;
         }
 
-        if (Object.keys(query).length == 1) {
-            // only MASTERCODE as a query string
-            config.MASTERCODE = query.MASTERCODE;
-        } else {
-            if (!('MASTERCODE' in config) || config.MASTERCODE == undefined) {
-                console.log("set the MASTERCODE first");
-                res.send('ERROR');
-                return;
-            }
+        updateConfig(query, res, config);
+        saveConfig(res, config);
+    });
+}
 
-            if (config.MASTERCODE != query.MASTERCODE) {
-                console.log("the given MASTERCODE doesn't correspond to the one in the database");
-        		console.log("expected: " + config.MASTERCODE + ", specified: " + query.MASTERCODE);
-                res.send('ERROR');
-                return;
-            }
-
-            delete query.MASTERCODE;
-
-            var invalidQueryExists = false;
-            Object.keys(query).forEach(function (queryString) {
-                var attributes = Object.keys(configModel.ConfigSchema.paths);
-                if (attributes.indexOf(queryString) == -1) {
-                    console.log("invalid query string '" + queryString + "'");
-                    console.log(attributes);
-                    invalidQueryExists = true;
-                    return;
-                }
-
-                config[queryString] = query[queryString];
-            });
-
-            if (invalidQueryExists) {
-                res.send('ERROR');
-                return;
-            }
+var updateConfig = function (query, res, config) {
+    if (Object.keys(query).length == 1) {
+        // only MASTERCODE as a query string
+        config.MASTERCODE = query.MASTERCODE;
+    } else {
+        if (!checkMastercode(query, config)) {
+            res.send('ERROR');
+            return;
         }
 
-        config.save(function (err) {
-            if (err) {
-                console.log(err);
-                res.send('ERROR');
-            } else {
-                configSync.syncHostapd(config, function (err) {
-                    if (err) {
-                        console.log(err);
-                        res.send('ERROR');
-                    } else {
-                        res.send('SUCCESS');
-                    }
-                });
-            }
-        });
+        delete query.MASTERCODE;
+
+        if (!mergeQuery(query, config)) {
+            res.send('ERROR');
+            return;
+        }
+    }
+}
+
+var checkMastercode = function (query, config) {
+    if (!('MASTERCODE' in config) || config.MASTERCODE == undefined) {
+        console.log("set the MASTERCODE first");
+        return false;
+    }
+
+    if (config.MASTERCODE != query.MASTERCODE) {
+        console.log("the given MASTERCODE doesn't correspond to the one in the database");
+		console.log("expected: " + config.MASTERCODE + ", specified: " + query.MASTERCODE);
+        return false;
+    }
+
+    return true;
+}
+
+var mergeQuery = function (query, config) {
+    var invalidQueryExists = false;
+    Object.keys(query).forEach(function (queryString) {
+        var attributes = Object.keys(configModel.ConfigSchema.paths);
+        if (attributes.indexOf(queryString) == -1) {
+            console.log("invalid query string '" + queryString + "'");
+            console.log(attributes);
+            invalidQueryExists = true;
+            return;
+        }
+
+        config[queryString] = query[queryString];
+    });
+
+    if (invalidQueryExists) {
+        return false;
+    }
+
+    return true;
+}
+
+var saveConfig = function (res, config) {
+    config.save(function (err) {
+        if (err) {
+            console.log(err);
+            res.send('ERROR');
+        } else {
+            configSync.syncHostapd(config, function (err) {
+                if (err) {
+                    console.log(err);
+                    res.send('ERROR');
+                } else {
+                    res.send('SUCCESS');
+                }
+            });
+        }
     });
 }
