@@ -15,7 +15,7 @@ exports.configExecutionCallback = function (req, res) {
 
 	console.log(query);
 
-    if (keys(query).length == 0) {
+    if (Object.keys(query).length == 0) {
         displayConfigTestPage(res);
     } else {
         processQuery(query, res);
