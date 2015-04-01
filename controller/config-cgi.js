@@ -12,15 +12,26 @@ var url = require("url"),
 
 exports.configExecutionCallback = function (req, res) {
 	var query = req.query;
-	var masterCode = query.MASTERCODE;
 
 	console.log(query);
 
-	if (!masterCode) {
-		console.log("config commands require the query string 'MASTERCODE'");
+    if (keys(query).length == 0) {
+        displayConfigTestPage(res);
+    } else {
+        processQuery(query, res);
+    }
+}
+
+var displayConfigTestPage = function (res) {
+    res.send(view.renderConfigTestPage(res));
+}
+
+var processQuery = function (query, res) {
+    if (!query.MASTERCODE) {
+        console.log("config commands require the query string 'MASTERCODE'");
         res.send('ERROR');
-		return;
-	}
+        return;
+    }
 
     res.contentType('text/plain');
 

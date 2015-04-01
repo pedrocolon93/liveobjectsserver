@@ -16,3 +16,8 @@ exports.renderUploadForm = function () {
     var formPath = path.join(__dirname, "upload.html");
     return fs.readFileSync(formPath, {"encoding": "utf8"});
 }
+
+exports.renderConfigTestPage = function () {
+    var pagePath = path.join(__dirname, "config.html");
+    return fs.readFileSync(pagePath, {"encoding": "utf8"});
+}
