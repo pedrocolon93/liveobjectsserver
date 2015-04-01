@@ -12,7 +12,7 @@ var commands = {
     '100' : { func: getFileList, params: [ "DIR" ] },
     '101' : { func: getNumFiles, params: [ "DIR" ] },
     '102' : { func: isUpdated, params: null },
-    '104' : { func: configParamGetter('APPNAME'), params: null },
+    '104' : { func: configParamGetter('APPSSID'), params: null },
     '105' : { func: configParamGetter('APPNETWORKKEY'), params: null },
     '106' : { func: getClientMacAddress, params: null },
 //  '107' not implemented

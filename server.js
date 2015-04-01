@@ -18,7 +18,6 @@ app.get("/*", StorageAccessor.fileGetCallback);
 
 app.post("/upload.cgi", uploadCgi.uploadFileCallback);
 
-
 configModel.connect(function () {
     console.log(process.argv[2]);
     http.createServer(app).listen(80, process.argv[2]);
