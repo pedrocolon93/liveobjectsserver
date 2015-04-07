@@ -81,7 +81,7 @@ function processQuery (query, res) {
     }
 
     if (command.params) {
-        var allQueriesExist = commands[op].params.reduce(function (accum, param) {
+        var allQueriesExist = command.params.reduce(function (accum, param) {
             return accum && (param in query);
         }, true);
 
