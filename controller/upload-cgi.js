@@ -72,6 +72,11 @@ exports.uploadFileCallback = function (req, res) {
             console.log(name);
             console.log(file);
 
+            if (file.originalFilename == '') {
+                res.send("failure");
+                return;
+            }
+
             var tmpPath = file.path;
             var uploadPath = path.join(
                 storagePath, uploadQuery.UPDIR.value, file.originalFilename);
