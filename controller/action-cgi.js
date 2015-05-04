@@ -1,5 +1,5 @@
 var fs = require("fs"),
-    configModel = require("../model/config.js"),
+    config = require("../model/config.js"),
     child_process = require("child_process"); 
 
 function Action(code, func, params) {
@@ -11,9 +11,9 @@ function Action(code, func, params) {
 var actions = [
     new Action('RESTART_NETWORK', restartNetwork, null),
     new Action('SET_BLE_NAME', configParamSetter('BLE_NAME'), [ 'value' ]),
-    new Action('GET_BLE_NAME', configParamGetter('BLE_NAME'), null),
+    new Action('GET_BLE_NAME', config.paramGetter('BLE_NAME'), null),
     new Action('SET_BLE_SERVICE_UUID', configParamSetter('BLE_SERVICE_UUID'), [ 'value' ]),
-    new Action('GET_BLE_SERVICE_UUID', configParamGetter('BLE_SERVICE_UUID'), null),
+    new Action('GET_BLE_SERVICE_UUID', config.paramGetter('BLE_SERVICE_UUID'), null),
     new Action('ENABLE_BLE', restartNetwork, null),
     new Action('DISABLE_BLE', restartNetwork, null),
 ];
@@ -70,18 +70,6 @@ function restartNetwork(callback) {
     }); 
 }
 
-function configParamGetter(paramName) {
-    return function (query, callback) {
-        config.getConfig(function (err, config) {
-            if (err) {
-                callback(err);
-            }
-
-            callback(null, config[paramName]);
-        });
-    }
-}
-
 function configParamSetter(paramName) {
     return function (query, callback) {
         config.getConfig(function (err, config) {
@@ -90,7 +78,7 @@ function configParamSetter(paramName) {
                 return;
             }
 
-            var attributes = Object.keys(configModel.ConfigSchema.paths);
+            var attributes = Object.keys(config.ConfigSchema.paths);
             if (attributes.indexOf(paramName) == -1) {
                 console.log(attributes);
                 callback("invalid query string '" + paramName + "'");

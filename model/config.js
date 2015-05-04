@@ -21,6 +21,18 @@ exports.getConfig = function (callback) {
     });         
 }
 
+exports.paramGetter = function (paramName) {
+    return function (query, callback) {
+        exports.getConfig(function (err, config) {
+            if (err) {
+                callback(err);
+            }
+
+            callback(null, config[paramName]);
+        });
+    };
+}
+
 exports.ConfigSchema = mongoose.Schema({
     APPAUTOTIME: Number,
     APPINFO: String,

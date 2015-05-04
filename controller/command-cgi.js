@@ -19,16 +19,16 @@ var commands = [
     new Command('get file list', 100, getFileList, [ "DIR" ]),
     new Command('get num files', 101, getNumFiles, [ "DIR" ]),
     new Command('is updated', 102, isUpdated, null),
-    new Command('get APPSSID', 104, configParamGetter('APPSSID'), null),
-    new Command('get APPNETWORKKEY', 105, configParamGetter('APPNETWORKKEY'), null),
+    new Command('get APPSSID', 104, config.paramGetter('APPSSID'), null),
+    new Command('get APPNETWORKKEY', 105, config.paramGetter('APPNETWORKKEY'), null),
     new Command('get client MAC addr', 106, getClientMacAddress, null),
 //  '107' not implemented
-    new Command('get VERSION', 108, configParamGetter('VERSION'), null),
+    new Command('get VERSION', 108, config.paramGetter('VERSION'), null),
 //  '109' not implemented
-    new Command('get APPMODE', 110, configParamGetter('APPMODE'), null),
-    new Command('get APPAUTOTIME', 111, configParamGetter('APPAUTOTIME'), null),
-    new Command('get APPINFO', 117, configParamGetter('APPINFO'), null),
-    new Command('get UPLOAD', 118, configParamGetter('UPLOAD'), null)
+    new Command('get APPMODE', 110, config.paramGetter('APPMODE'), null),
+    new Command('get APPAUTOTIME', 111, config.paramGetter('APPAUTOTIME'), null),
+    new Command('get APPINFO', 117, config.paramGetter('APPINFO'), null),
+    new Command('get UPLOAD', 118, config.paramGetter('UPLOAD'), null)
 // '120' not implemented
 // '121' not implemented
 // '130' not implemented
@@ -126,16 +126,4 @@ function isUpdated (query, callback) {
 
 function getClientMacAddress (query, callback) {
     callback(null, 'aabbccddeeff'); // placeholder
-}
-
-function configParamGetter (paramName) {
-    return function (query, callback) {
-        config.getConfig(function (err, config) {
-            if (err) {
-                callback(err);
-            }
-
-            callback(null, config[paramName]);
-        });
-    };
 }
