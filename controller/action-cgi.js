@@ -1,9 +1,22 @@
 var fs = require("fs"),
+    configModel = require("../model/config.js"),
     child_process = require("child_process"); 
 
-var actions = {
-    RESTART_NETWORK : { func: restartNetwork, params: null },
-};
+function Action(code, func, params) {
+    this.code = code;
+    this.func = func;
+    this.params = params;
+}
+
+var actions = [
+    new Action('RESTART_NETWORK', restartNetwork, null),
+    new Action('SET_BLE_NAME', configParamSetter('BLE_NAME'), [ 'value' ]),
+    new Action('GET_BLE_NAME', configParamGetter('BLE_NAME'), null),
+    new Action('SET_BLE_SERVICE_UUID', configParamSetter('BLE_SERVICE_UUID'), [ 'value' ]),
+    new Action('GET_BLE_SERVICE_UUID', configParamGetter('BLE_SERVICE_UUID'), null),
+    new Action('ENABLE_BLE', restartNetwork, null),
+    new Action('DISABLE_BLE', restartNetwork, null),
+];
 
 exports.actionExecutionCallback = function (req, res) {
     var query = req.query;
@@ -15,17 +28,38 @@ exports.actionExecutionCallback = function (req, res) {
         return;
     }
 
-    if (!(code in actions)) {
-        console.log("undefined code '" + code + "'");
+    var action = actions.filter(function (x) {
+        return (x.code == code);
+    })[0];
+
+    if (action == undefined) {
+        console.log("action(code=" + op + ") is not defined");
         res.sendStatus(404);
         return;
     }
 
-    actions[code].func(function(err) {
+    if (action.params) {
+        var allQueriesExist = action.params.reduce(function (accum, param) {
+            return accum && (param in query);
+        }, true);
+
+        if (!allQueriesExist) {
+            console.log("one or more missing query strings");
+            res.sendStatus(404);
+            return;
+        }
+    }
+
+    res.contentType('text/plain');
+
+    action.func(query, function(err, message) {
         if (err) {
             console.log(err);
             res.sendStatus(500);
+            return;
         }
+
+        res.send(message);
     });
 }
 
@@ -34,5 +68,47 @@ function restartNetwork(callback) {
         function (err, stdout, stderr) {
             callback(err);
     }); 
+}
 
+function configParamGetter(paramName) {
+    return function (query, callback) {
+        config.getConfig(function (err, config) {
+            if (err) {
+                callback(err);
+            }
+
+            callback(null, config[paramName]);
+        });
+    }
+}
+
+function configParamSetter(paramName) {
+    return function (query, callback) {
+        config.getConfig(function (err, config) {
+            if (err) {
+                callback(err);
+                return;
+            }
+
+            var attributes = Object.keys(configModel.ConfigSchema.paths);
+            if (attributes.indexOf(paramName) == -1) {
+                console.log(attributes);
+                callback("invalid query string '" + paramName + "'");
+                return;
+            }
+
+            console.log(config);
+            config[paramName] = query.value;
+
+            console.log(config);
+            config.save(function (err) {
+                if (err) {
+                    callback(err);
+                    return;
+                }
+
+                callback(null, 'success');
+            });
+        });
+    }
 }
