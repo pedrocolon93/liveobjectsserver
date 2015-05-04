@@ -10,9 +10,9 @@ function Action(code, func, params) {
 
 var actions = [
     new Action('RESTART_NETWORK', restartNetwork, null),
-    new Action('SET_BLE_NAME', configParamSetter('BLE_NAME'), [ 'value' ]),
+    new Action('SET_BLE_NAME', config.paramSetter('BLE_NAME'), [ 'value' ]),
     new Action('GET_BLE_NAME', config.paramGetter('BLE_NAME'), null),
-    new Action('SET_BLE_SERVICE_UUID', configParamSetter('BLE_SERVICE_UUID'), [ 'value' ]),
+    new Action('SET_BLE_SERVICE_UUID', config.paramSetter('BLE_SERVICE_UUID'), [ 'value' ]),
     new Action('GET_BLE_SERVICE_UUID', config.paramGetter('BLE_SERVICE_UUID'), null),
     new Action('ENABLE_BLE', restartNetwork, null),
     new Action('DISABLE_BLE', restartNetwork, null),
@@ -68,35 +68,4 @@ function restartNetwork(callback) {
         function (err, stdout, stderr) {
             callback(err);
     }); 
-}
-
-function configParamSetter(paramName) {
-    return function (query, callback) {
-        config.getConfig(function (err, config) {
-            if (err) {
-                callback(err);
-                return;
-            }
-
-            var attributes = Object.keys(config.ConfigSchema.paths);
-            if (attributes.indexOf(paramName) == -1) {
-                console.log(attributes);
-                callback("invalid query string '" + paramName + "'");
-                return;
-            }
-
-            console.log(config);
-            config[paramName] = query.value;
-
-            console.log(config);
-            config.save(function (err) {
-                if (err) {
-                    callback(err);
-                    return;
-                }
-
-                callback(null, 'success');
-            });
-        });
-    }
 }

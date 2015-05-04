@@ -33,6 +33,37 @@ exports.paramGetter = function (paramName) {
     };
 }
 
+exports.paramSetter = function (paramName) {
+    return function (query, callback) {
+        exports.getConfig(function (err, config) {
+            if (err) {
+                callback(err);
+                return;
+            }
+
+            var attributes = Object.keys(config.ConfigSchema.paths);
+            if (attributes.indexOf(paramName) == -1) {
+                console.log(attributes);
+                callback("invalid query string '" + paramName + "'");
+                return;
+            }
+
+            console.log(config);
+            config[paramName] = query.value;
+
+            console.log(config);
+            config.save(function (err) {
+                if (err) {
+                    callback(err);
+                    return;
+                }
+
+                callback(null, 'success');
+            });
+        });
+    }
+}
+
 exports.ConfigSchema = mongoose.Schema({
     APPAUTOTIME: Number,
     APPINFO: String,
