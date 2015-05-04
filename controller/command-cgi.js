@@ -8,31 +8,27 @@ var url = require("url"),
     view = require("../view/view.js"),
     config = require("../model/config.js");
 
+function Command(desc, op, func, params) {
+    this.desc = desc;
+    this.op = op;
+    this.func = func;
+    this.params = params;
+}
+
 var commands = [
-    { desc: 'get file list',
-        op: 100, func: getFileList, params: [ "DIR" ] },
-    { desc: 'get num files',
-        op: 101, func: getNumFiles, params: [ "DIR" ] },
-    { desc: 'is updated',
-        op: 102, func: isUpdated, params: null },
-    { desc: 'get APPSSID',
-        op: 104, func: configParamGetter('APPSSID'), params: null },
-    { desc: 'get APPNETWORKKEY',
-        op: 105, func: configParamGetter('APPNETWORKKEY'), params: null },
-    { desc: 'get client MAC addr',
-        op: 106, func: getClientMacAddress, params: null },
+    new Command('get file list', 100, getFileList, [ "DIR" ]),
+    new Command('get num files', 101, getNumFiles, [ "DIR" ]),
+    new Command('is updated', 102, isUpdated, null),
+    new Command('get APPSSID', 104, configParamGetter('APPSSID'), null),
+    new Command('get APPNETWORKKEY', 105, configParamGetter('APPNETWORKKEY'), null),
+    new Command('get client MAC addr', 106, getClientMacAddress, null),
 //  '107' not implemented
-    { desc: 'get VERSION',
-        op: 108, func: configParamGetter('VERSION'), param: null },
+    new Command('get VERSION', 108, configParamGetter('VERSION'), null),
 //  '109' not implemented
-    { desc: 'get APPMODE',
-        op: 110, func: configParamGetter('APPMODE'), param: null },
-    { desc: 'get APPAUTOTIME',
-        op: 111, func: configParamGetter('APPAUTOTIME'), param: null },
-    { desc: 'get APPINFO',
-        op: 117, func: configParamGetter('APPINFO'), param: null },
-    { desc: 'get UPLOAD',
-        op: 118, func: configParamGetter('UPLOAD'), param: null }
+    new Command('get APPMODE', 110, configParamGetter('APPMODE'), null),
+    new Command('get APPAUTOTIME', 111, configParamGetter('APPAUTOTIME'), null),
+    new Command('get APPINFO', 117, configParamGetter('APPINFO'), null),
+    new Command('get UPLOAD', 118, configParamGetter('UPLOAD'), null)
 // '120' not implemented
 // '121' not implemented
 // '130' not implemented
