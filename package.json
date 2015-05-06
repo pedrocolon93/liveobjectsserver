@@ -1,16 +1,27 @@
 {
-	"name": "flashair_compat_server",
-	"description": "a server app that has the (almost) same web interfaces with Toshiba FlashAir",
-	"version": "0.0.1",
-	"dependencies" : {
-		"express": "4.11.2",
-		"jade": "1.9.2",
-        "multiparty": "4.1.1",
-		"sprintf": "0.1.5",
-		"q": "1.1.2",
-		"mongodb": "1.4.30",
-		"mongoose": "3.8.23",
-		"bleno": "0.1.2",
-		"mocha": "2.1.0"
-	}
+  "name": "flashair_compat_server",
+  "version": "1.0.0",
+  "description": "a server app that has the (almost) same web API with Toshiba FlashAir",
+  "main": "server.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/amiyamoto/flashair_compat_server"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bleno": "^0.1.12",
+    "express": "^4.12.3",
+    "jade": "^1.9.2",
+    "mongoose": "^4.0.2",
+    "multiparty": "^4.1.1",
+    "sprintf": "^0.1.5"
+  }
 }
