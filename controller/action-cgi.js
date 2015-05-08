@@ -2,6 +2,7 @@ var fs = require("fs"),
     config = require("../model/config.js"),
     ble = require("../network/ble.js"),
     wifi = require("../network/wifi.js"),
+    power_manager = require("../network/power_manager.js"),
     child_process = require("child_process"); 
 
 function Action(code, func, params) {
@@ -21,7 +22,10 @@ var actions = [
 
     new Action('TURN_ON_WIFI', wifi.turnOn, null),
     new Action('TURN_OFF_WIFI', wifi.turnOff, null),
-    new Action('NUM_CONNECTED_WIFI_STA', showConnectedDeviceCount, null)
+    new Action('NUM_CONNECTED_WIFI_STA', showConnectedDeviceCount, null),
+
+    new Action('ENABLE_POWER_MANAGEMENT', power_manager.enable, null),
+    new Action('DISABLE_POWER_MANAGEMENT', power_manager.disable, null)
 ];
 
 exports.actionExecutionCallback = function (req, res) {
