@@ -108,16 +108,18 @@ var getStatOfFiles = function (filePaths) {
     return deferred.promise;
 }
 
-exports.getStoragePath = function () {
+exports.getStoragePath = function (relativePath) {
     var deferred = q.defer();
 
-    var storageDir = path.join(__dirname, '..', 'storage');
+    var storageDir = (relativePath == undefined ?
+        path.join(__dirname, '..', 'storage') :
+        path.join(__dirname, relativePath));
 
     fs.mkdir(storageDir)
     .then(function () {
         deferred.resolve(storageDir);
     })
-    .fail(function (error) {
+    .catch(function (error) {
         if (error.code !== 'EEXIST') {
             deferred.reject(error.code);
         }

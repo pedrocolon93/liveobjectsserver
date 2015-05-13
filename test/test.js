@@ -1,19 +1,38 @@
-var should = require("should");
+var should = require("should"),
+    path = require("path"),
+    thenifyAll = require("thenify-all"),
+    q = require('q'),
+    storageAccessor = require('../controller/StorageAccessor.js');
 
-describe("Array", function () {
-	describe("#indexOf()", function () {
-		it("should return -1 when the value is not present", function () {
-            [1, 2, 3].indexOf(5).should.equal(-1);
-            [1, 2, 3].indexOf(0).should.equal(-1);
+var fs = thenifyAll(require('fs'), {}, [
+    'mkdir',
+    'rmdir',
+]);
+
+describe("StorageAccessor", function () {
+    var relativePath = ".";
+
+    before(function(done) {
+        var dirPath = path.join(__dirname, relativePath, 'storage');
+        fs.rmdir(dirPath)
+        .then(done)
+        .catch(function(error) {
+            if (error.code === 'ENOENT') {
+                done();
+            } else {
+                done(error);
+            }
+        });
+    });
+
+	describe("#getStoragePath()", function () {
+		it("should return the path to 'storage' dir", function () {
+            storageAccessor.getStoragePath(relativePath)
+            .then(function (resultPath) {
+                var expectedPath = path.join(__dirname, relativePath);
+                return resultPath.should.equal(expectedPath);
+            });
 		})
 	})
 })
 
-describe("User", function() {
-    descripbe('#save()', function() {
-        it('should save without error', function(done) {
-            var user = new User('Luna');
-            user.save(done);
-        })
-    })
-});
