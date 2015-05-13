@@ -6,12 +6,13 @@ var url = require("url"),
     thenifyAll = require("thenify-all");
 
 exports.fileGetCallback = function (req, res) {
-	var uri = url.parse(req.url).pathname;
-	var filePath = path.join(exports.getStoragePath(), uri);
-
-	console.log("req.url = " + req.url + ", pathname = " + uri);
-
-    fs.stat(filePath)
+    exports.getStoragePath()
+    .then(function (storagePath) {
+	    var uri = url.parse(req.url).pathname;
+    	var filePath = path.join(storagePath, uri);
+        return filePath;
+    })
+    .then(fs.stat)
     .then(function (stats) {
    		if (stats.isFile()) {
 			sendFile(filePath, res);
@@ -108,17 +109,21 @@ var getStatOfFiles = function (filePaths) {
 }
 
 exports.getStoragePath = function () {
+    var deferred = q.defer();
+
     var storageDir = path.join(__dirname, '..', 'storage');
 
-    try {
-        fs.mkdirSync(storageDir);
-    } catch (err) {
-        if (err.code !== 'EEXIST') {
-            throw err.code;
+    fs.mkdir(storageDir)
+    .then(function () {
+        deferred.resolve(storageDir);
+    })
+    .fail(function (error) {
+        if (error.code !== 'EEXIST') {
+            deferred.reject(error.code);
         }
-    }
+    });
 
-	return storageDir;
+	return deferred.promise;
 }
 
 var sendFileListView = function (res, files) {
@@ -128,4 +133,5 @@ var sendFileListView = function (res, files) {
 var fs = thenifyAll(require('fs'), {}, [
     'readdir',
     'stat',
+    'mkdir',
 ]);
