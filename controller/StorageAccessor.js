@@ -1,9 +1,9 @@
 var url = require("url"),
 	path = require("path"),
-	fs = require("fs"),
 	os = require("os"),
 	view = require("../view/view.js")
-    q = require("q");
+    q = require("q"),
+    thenifyAll = require("thenify-all");
 
 exports.fileGetCallback = function (req, res) {
 	var uri = url.parse(req.url).pathname;
@@ -11,7 +11,7 @@ exports.fileGetCallback = function (req, res) {
 
 	console.log("req.url = " + req.url + ", pathname = " + uri);
 
-    fsStatPromised(filePath)
+    fs.stat(filePath)
     .then(function (stats) {
    		if (stats.isFile()) {
 			sendFile(filePath, res);
@@ -57,7 +57,7 @@ var sendDirectoryView = function (dirPath, res) {
 exports.getStatOfDirContents = function (dirPath) {
     var deferred = q.defer();
 
-	fsReaddirPromised(dirPath)
+	fs.readdir(dirPath)
     .then(function (files) {
 		// this code can be refactored using promises
 		var absolutePaths = files.map(function (file) {
@@ -89,8 +89,12 @@ var getStatOfFiles = function (filePaths) {
 	}
 
     var statses = [];
+    var promises = [];
+    filePaths.forEach(function (filePath) {
+        promises.push(fs.stat(filePath));
+    });
 
-    q.all(filePaths.map(fsStatPromised))
+    q.all(promises)
     .then(function (stats) {
         for (var i = 0; i < filePaths.length; i++) {
             statses.push({file: filePaths[i], stats: stats[i]});
@@ -121,30 +125,7 @@ var sendFileListView = function (res, files) {
 	res.send(view.renderFileList(files));
 }
 
-function fsReaddirPromised(dirPath) {
-    var deferred = q.defer();
-
-	fs.readdir(dirPath, function (error, files) {
-        if (error) {
-            deferred.reject(error);
-        } else {
-            deferred.resolve(files);
-        }
-    });
-
-    return deferred.promise;
-}
-
-function fsStatPromised(filePath) {
-    var deferred = q.defer();
-
-    fs.stat(filePath, function (error, stats) {
-        if (error) {
-            deferred.reject(error);
-        } else {
-            deferred.resolve(stats);
-        }
-    });
-
-    return deferred.promise;
-}
+var fs = thenifyAll(require('fs'), {}, [
+    'readdir',
+    'stat',
+]);

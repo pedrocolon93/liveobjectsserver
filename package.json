@@ -24,6 +24,7 @@
     "multiparty": "^4.1.1",
     "q": "^1.4.0",
     "should": "^6.0.1",
-    "sprintf": "^0.1.5"
+    "sprintf": "^0.1.5",
+    "thenify-all": "^1.6.0"
   }
 }
